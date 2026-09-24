@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Café des Formules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   1. THEME — colors live here. Change these, the whole app follows.
+   ============================================================ */
+:root{
+  --bg:#FBF4EA; --surface:#FFFDF9; --surface-2:#F5EADB; --line:#E8D8C4;
+  --ink:#3B2A20; --muted:#7A6353;
+  --accent:#C8633A; --accent-soft:#F7DCCB; --accent-ink:#FFFFFF;
+  --ok:#3F7F4E; --ok-soft:#DCEFD9; --bad:#B43E32; --bad-soft:#F8DAD5;
+  --shadow:0 2px 0 rgba(59,42,32,.08), 0 8px 24px rgba(59,42,32,.06);
+  --radius:16px;
+  --font-head:"Fredoka", "Trebuchet MS", sans-serif;
+  --font-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1E1712; --surface:#2A211A; --surface-2:#33281F; --line:#46382C;
+    --ink:#F6EADC; --muted:#C2AA94;
+    --accent:#E8895C; --accent-soft:#4A2E20; --accent-ink:#1E1712;
+    --ok:#7CC08A; --ok-soft:#23382A; --bad:#EE8577; --bad-soft:#452622;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6;min-height:100vh}
+h1,h2,h3{font-family:var(--font-head);line-height:1.2;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+.mono{font-family:var(--font-mono)}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px 64px}
+
+/* ============================================================
+   2. HEADER + TABS
+   ============================================================ */
+header{display:flex;align-items:center;gap:12px;padding:18px 0 10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand h1{font-size:1.5rem}
+.brand small{display:block;color:var(--muted);font-size:.85rem;font-family:var(--font-body)}
+nav{display:flex;gap:6px;background:var(--surface-2);padding:5px;border-radius:999px}
+nav button{border:0;background:transparent;padding:8px 14px;border-radius:999px;font-weight:700;font-size:.95rem;color:var(--muted)}
+nav button[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+
+/* ============================================================
+   3. SHARED PIECES
+   ============================================================ */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.btn{border:2px solid var(--line);background:var(--surface);padding:10px 16px;border-radius:12px;font-weight:700}
+.btn:hover{border-color:var(--accent)}
+.btn-main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);padding:12px 22px;font-size:1.05rem}
+.btn-main:hover{filter:brightness(1.07)}
+.btn-ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.bar{height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.bar > span{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.pill{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--surface-2);color:var(--muted)}
+.muted{color:var(--muted)}
+
+/* ============================================================
+   4. HOME — topic picker
+   ============================================================ */
+.hero{display:flex;gap:18px;align-items:center;margin:14px 0 22px;flex-wrap:wrap}
+.hero .card{flex:1;min-width:260px;display:flex;gap:16px;align-items:center}
+.hero h2{font-size:1.6rem;margin-bottom:4px}
+.topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.topic{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;transition:transform .15s}
+.topic:hover{transform:translateY(-2px);border-color:var(--accent)}
+.topic h3{font-size:1.2rem}
+.topic .pill{align-self:flex-start}
+.topic .row{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--muted)}
+
+/* ============================================================
+   5. PRACTICE screen
+   ============================================================ */
+.topbar{display:flex;align-items:center;gap:10px;margin:10px 0 14px;flex-wrap:wrap}
+.topbar .count{margin-left:auto}
+.task h2{font-size:1.35rem;margin-bottom:6px}
+.task p{margin:0 0 4px}
+.task b{color:var(--accent)}
+.sheet-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.sheet{border-collapse:collapse;font-size:.95rem;min-width:100%}
+.sheet th{background:var(--surface-2);color:var(--muted);font-weight:700;font-size:.8rem;padding:4px 8px;border:1px solid var(--line);position:sticky;top:0}
+.sheet th.rh{min-width:34px;text-align:center}
+.sheet td{border:1px solid var(--line);padding:6px 10px;min-width:92px;white-space:nowrap;cursor:pointer;height:36px}
+.sheet td:hover{background:var(--surface-2)}
+.sheet td.num{text-align:right;font-variant-numeric:tabular-nums}
+.sheet td.fillc{background:var(--accent-soft)}
+.sheet td.target{outline:3px solid var(--accent);outline-offset:-3px;background:var(--accent-soft)}
+.sheet td.ok{background:var(--ok-soft);color:var(--ok);font-weight:700}
+.sheet td.bad{background:var(--bad-soft);color:var(--bad);font-weight:700}
+.sheet tr:first-child td{font-weight:700}
+.fx{display:flex;align-items:stretch;border:2px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.fx:focus-within{border-color:var(--accent)}
+.fx label{display:flex;align-items:center;padding:0 12px;background:var(--surface-2);font-family:var(--font-mono);font-weight:700;color:var(--muted);font-style:italic}
+.fx input{flex:1;border:0;background:transparent;color:var(--ink);font-family:var(--font-mono);font-size:1.1rem;padding:12px;min-width:0;outline:none}
+.tip{font-size:.85rem;color:var(--muted);margin:6px 2px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.feedback{display:flex;gap:14px;align-items:flex-start;margin-top:16px;padding:16px;border-radius:14px;border:2px solid var(--line);background:var(--surface-2)}
+.feedback.ok{border-color:var(--ok);background:var(--ok-soft)}
+.feedback.bad{border-color:var(--bad);background:var(--bad-soft)}
+.feedback .msg{flex:1}
+.feedback .msg strong{font-family:var(--font-head);font-size:1.15rem;display:block;margin-bottom:2px}
+.feedback code,.task code,.cheat code{font-family:var(--font-mono);background:var(--surface);padding:1px 6px;border-radius:6px;font-size:.92em;border:1px solid var(--line)}
+.options{display:grid;gap:10px;margin-top:14px}
+.opt{text-align:left;border:2px solid var(--line);background:var(--surface);padding:14px 16px;border-radius:12px;font-weight:700}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt[disabled]{cursor:default}
+.cat svg{display:block}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
+.hop{animation:hop .5s ease}
+
+/* ============================================================
+   6. PROGRESS + CHEAT SHEET
+   ============================================================ */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0 20px}
+.stat{padding:16px}
+.stat b{display:block;font-family:var(--font-head);font-size:2rem;line-height:1.1}
+.prog-row{display:grid;grid-template-columns:1fr 2fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.prog-row:last-child{border-bottom:0}
+.search{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;margin:12px 0 18px}
+.search:focus{border-color:var(--accent);outline:none}
+.cheat h3{font-size:1.2rem;margin:22px 0 10px}
+.fn{padding:14px 16px;margin-bottom:10px}
+.fn .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.fn .name{font-family:var(--font-mono);font-weight:700;font-size:1.05rem;color:var(--accent)}
+.fn .syn{font-family:var(--font-mono);font-size:.9rem;margin:6px 0 4px;overflow-wrap:anywhere}
+.fn p{margin:2px 0}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+
+@media (max-width:600px){
+  header{padding-top:12px}
+  nav{width:100%;justify-content:space-between}
+  nav button{padding:8px 10px;font-size:.88rem}
+  .actions .btn-main{width:100%}
+  .prog-row{grid-template-columns:1fr auto}
+  .prog-row .bar{grid-column:1 / -1;order:3}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="cat" id="logo"></span>
+      <div><h1>Café des Formules</h1><small>Excel practice · 420-2D4</small></div>
+    </div>
+    <nav aria-label="Main">
+      <button data-go="home">Practice</button>
+      <button data-go="progress">Progress</button>
+      <button data-go="cheat">Cheat sheet</button>
+    </nav>
+  </header>
+  <main id="app" aria-live="polite"></main>
+</div>
+
+<script>
+/* ==================================================================
+   PART A — THE MINI EXCEL ENGINE
+   Reads a formula like =SI(B2>=60;"Réussi";"Échec") and computes it.
+   Steps: tokenize (cut into pieces) -> parse (build a tree) -> evaluate.
+   ================================================================== */
+
+class XErr { constructor(code, msg){ this.code = code; this.msg = msg; } }
+const fail = (code, msg) => { throw new XErr(code, msg); };
+
+const stripAcc = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '');
+function colToNum(s){ let n = 0; for (const ch of s.toUpperCase()) n = n * 26 + (ch.charCodeAt(0) - 64); return n; }
+function numToCol(n){ let s = ''; while (n > 0){ const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; }
+function parseAddr(a){ const m = /^([A-Z]+)(\d+)$/.exec(a); return { c: colToNum(m[1]), r: +m[2] }; }
+function parseNumFr(s){ const t = String(s).trim(); return /^-?\d+(?:[.,]\d+)?$/.test(t) ? parseFloat(t.replace(',', '.')) : null; }
+
+// English names -> French names, so we can give a friendly hint.
+const EN_FR = { SUM:'SOMME', AVERAGE:'MOYENNE', COUNT:'NB', COUNTA:'NBVAL', IF:'SI', AND:'ET', OR:'OU', NOT:'NON',
+  XLOOKUP:'RECHERCHEX', VLOOKUP:'RECHERCHEV', SUMIF:'SOMME.SI', COUNTIF:'NB.SI', AVERAGEIF:'MOYENNE.SI',
+  SUMIFS:'SOMME.SI.ENS', COUNTIFS:'NB.SI.ENS', TODAY:'AUJOURDHUI', NOW:'MAINTENANT', DAY:'JOUR', MONTH:'MOIS',
+  YEAR:'ANNEE', WEEKDAY:'JOURSEM', TEXT:'TEXTE', LEFT:'GAUCHE', RIGHT:'DROITE', MID:'STXT', LEN:'NBCAR',
+  FIND:'TROUVE', SEARCH:'CHERCHE', UPPER:'MAJUSCULE', LOWER:'MINUSCULE', PROPER:'NOMPROPRE', TRIM:'SUPPRESPACE',
+  RAND:'ALEA', RANDBETWEEN:'ALEA.ENTRE.BORNES', INT:'ENT', ROUND:'ARRONDI', ROUNDUP:'ARRONDI.SUP',
+  ROUNDDOWN:'ARRONDI.INF', IFERROR:'SIERREUR', CONCATENATE:'CONCATENER', TRUE:'VRAI', FALSE:'FAUX' };
+
+// --- 1. Tokenize: cut the text into pieces (numbers, cells, functions...) ---
+function tokenize(src){
+  const t = []; let i = 0;
+  while (i < src.length){
+    const c = src[i], rest = src.slice(i); let m;
+    if (/\s/.test(c)){ i++; continue; }
+    if (c === '"'){
+      let j = i + 1, s = '';
+      for (;;){
+        if (j >= src.length) fail('PARSE', 'A quote <code>"</code> is opened but never closed.');
+        if (src[j] === '"'){ if (src[j + 1] === '"'){ s += '"'; j += 2; continue; } break; }
+        s += src[j++];
+      }
+      t.push({ k:'str', v:s }); i = j + 1; continue;
+    }
+    if ((m = /^\d+(?:[.,]\d+)?/.exec(rest))){ t.push({ k:'num', v:parseFloat(m[0].replace(',', '.')) }); i += m[0].length; continue; }
+    if ((m = /^(\$?)([A-Za-z]{1,3})(\$?)(\d+)(?![A-Za-z0-9_.(])/.exec(rest))){
+      t.push({ k:'ref', c:colToNum(m[2]), r:+m[4], ac:!!m[1], ar:!!m[3] }); i += m[0].length; continue;
+    }
+    if ((m = /^[A-Za-zÀ-ÿ_][A-Za-zÀ-ÿ0-9_.]*/.exec(rest))){
+      const name = stripAcc(m[0]).toUpperCase(); i += m[0].length;
+      let j = i; while (src[j] === ' ') j++;
+      if (src[j] === '('){ t.push({ k:'fn', v:name, raw:m[0] }); i = j; continue; }
+      if (name === 'VRAI' || name === 'FAUX'){ t.push({ k:'bool', v:name === 'VRAI' }); continue; }
+      if (EN_FR[name]) fail('#NOM?', `<code>${m[0]}</code> is English. In French Excel, write <code>${EN_FR[name]}</code>.`);
+      fail('#NOM?', `Excel doesn't know <code>${m[0]}</code>. If it's text, put it between quotes: <code>"${m[0]}"</code>.`);
+    }
+    const two = rest.slice(0, 2);
+    if (['<=', '>=', '<>'].includes(two)){ t.push({ k:'op', v:two }); i += 2; continue; }
+    if ('+-*/^&=<>%'.includes(c)){ t.push({ k:'op', v:c }); i++; continue; }
+    if ('();:'.includes(c)){ t.push({ k:c }); i++; continue; }
+    if (c === ',') fail('PARSE', 'In French Excel, you separate arguments with <code>;</code> (semicolon), not a comma.');
+    fail('PARSE', `I don't understand the character <code>${c}</code>.`);
+  }
+  return t;
+}
+
+// --- 2. Parse: build a tree, following Excel's order of operations ---
+function parse(formula){
+  const s = String(formula).trim();
+  if (!s.startsWith('=')) fail('PARSE', 'A formula always starts with <code>=</code>.');
+  if (s.length === 1) fail('PARSE', 'Your formula is empty. Type something after the <code>=</code>.');
+  const toks = tokenize(s.slice(1)); let p = 0;
+  const peek = () => toks[p], next = () => toks[p++];
+  const isOp = list => peek() && peek().k === 'op' && list.includes(peek().v);
+  const bin = (sub, ops) => () => { let l = sub(); while (isOp(ops)){ const op = next().v; l = { t:'bin', op, l, r:sub() }; } return l; };
+  const primary = () => {
+    const tk = next();
+    if (!tk) fail('PARSE', 'The formula stops too early. Something is missing at the end.');
+    if (tk.k === 'num') return { t:'num', v:tk.v };
+    if (tk.k === 'str') return { t:'str', v:tk.v };
+    if (tk.k === 'bool') return { t:'bool', v:tk.v };
+    if (tk.k === 'ref'){
+      if (peek() && peek().k === ':'){ next(); const b = next();
+        if (!b || b.k !== 'ref') fail('PARSE', 'After <code>:</code> you need another cell, like <code>A1:A5</code>.');
+        return { t:'range', a:tk, b }; }
+      return { t:'ref', ...tk };
+    }
+    if (tk.k === '('){ const e = cmp(); if (!peek() || peek().k !== ')') fail('PARSE', 'A parenthesis <code>(</code> is not closed.'); next(); return e; }
+    if (tk.k === 'fn'){
+      next(); const args = [];
+      if (peek() && peek().k === ')'){ next(); return { t:'fn', name:tk.v, raw:tk.raw, args }; }
+      for (;;){
+        if (peek() && (peek().k === ';' || peek().k === ')')) args.push({ t:'empty' }); else args.push(cmp());
+        const n = next();
+        if (!n) fail('PARSE', `The parenthesis of <code>${tk.raw}(</code> is never closed.`);
+        if (n.k === ')') break;
+        if (n.k !== ';') fail('PARSE', `Something is off inside <code>${tk.raw}( )</code>. Check your <code>;</code> separators.`);
+      }
+      return { t:'fn', name:tk.v, raw:tk.raw, args };
+    }
+    if (tk.k === ')') fail('PARSE', 'There is a <code>)</code> where a value should be.');
+    if (tk.k === ';') fail('PARSE', 'There is a <code>;</code> outside of a function.');
+    fail('PARSE', `Unexpected <code>${tk.v || tk.k}</code>.`);
+  };
+  const postfix = () => { let e = primary(); while (isOp(['%'])){ next(); e = { t:'pct', e }; } return e; };
+  const unary = () => { if (isOp(['-'])){ next(); return { t:'neg', e:unary() }; } if (isOp(['+'])){ next(); return unary(); } return postfix(); };
+  const pow = bin(unary, ['^']), mul = bin(pow, ['*', '/']), add = bin(mul, ['+', '-']), cat = bin(add, ['&']);
+  const cmp = bin(cat, ['=', '<>', '<', '>', '<=', '>=']);
+  const ast = cmp();
+  if (p < toks.length){
+    if (toks[p].k === ')') fail('PARSE', 'There is one closing parenthesis <code>)</code> too many.');
+    fail('PARSE', 'There is something extra at the end. A missing operator or <code>;</code>?');
+  }
+  return ast;
+}
+
+// --- 3. Evaluate: compute the value ---
+const isRange = v => v && v.range === true;
+function scal(v){ if (isRange(v)){ if (v.vals.length === 1) return v.vals[0]; fail('#VALEUR!', 'This gives a whole range, not one value. Wrap it in a function like <code>SOMME( )</code>.'); } return v; }
+function num(v){
+  v = scal(v);
+  if (v === null || v === undefined) return 0;
+  if (typeof v === 'number') return v;
+  if (typeof v === 'boolean') return v ? 1 : 0;
+  const n = parseNumFr(v); if (n !== null) return n;
+  fail('#VALEUR!', `<code>"${v}"</code> is text, so Excel can't do math with it.`);
+}
+function fmtPlain(n){ if (!isFinite(n)) return String(n); const r = Number(n.toPrecision(12)); return String(r).replace('.', ','); }
+function txt(v){ v = scal(v); if (v === null || v === undefined) return ''; if (typeof v === 'number') return fmtPlain(v); if (typeof v === 'boolean') return v ? 'VRAI' : 'FAUX'; return String(v); }
+function bool(v){ v = scal(v); if (v === null) return false; if (typeof v === 'boolean') return v; if (typeof v === 'number') return v !== 0;
+  const u = String(v).toUpperCase(); if (u === 'VRAI') return true; if (u === 'FAUX') return false;
+  fail('#VALEUR!', `<code>"${v}"</code> is text, not a VRAI/FAUX test. Did you forget a comparison like <code>&gt;=</code>?`); }
+function rank(v){ return typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : 2; }
+function compare(op, a, b){
+  a = scal(a); b = scal(b);
+  if (a === null) a = typeof b === 'string' ? '' : typeof b === 'boolean' ? false : 0;
+  if (b === null) b = typeof a === 'string' ? '' : typeof a === 'boolean' ? false : 0;
+  let d;
+  if (rank(a) !== rank(b)) d = rank(a) - rank(b);
+  else if (typeof a === 'string') { const x = a.toLowerCase(), y = b.toLowerCase(); d = x < y ? -1 : x > y ? 1 : 0; }
+  else d = Number(a) - Number(b);
+  if (Math.abs(d) < 1e-12) d = 0;
+  return { '=':d === 0, '<>':d !== 0, '<':d < 0, '>':d > 0, '<=':d <= 0, '>=':d >= 0 }[op];
+}
+function pos(n, ctx){ return { c: n.c + (n.ac ? 0 : ctx.dc), r: n.r + (n.ar ? 0 : ctx.dr) }; }
+function cellAt(ctx, c, r){
+  if (c < 1 || r < 1) fail('#REF!', 'That reference slides off the edge of the sheet when copied. Should it be locked with <code>$</code>?');
+  if (ctx.self && ctx.self.c === c && ctx.self.r === r) fail('#REF!', 'Circular reference: your formula uses its own cell.');
+  const v = ctx.cells[numToCol(c) + r]; return v === undefined ? null : v;
+}
+function ev(n, ctx){
+  switch (n.t){
+    case 'num': case 'str': case 'bool': return n.v;
+    case 'empty': return null;
+    case 'ref': { const q = pos(n, ctx); return cellAt(ctx, q.c, q.r); }
+    case 'range': {
+      const a = pos(n.a, ctx), b = pos(n.b, ctx);
+      const c1 = Math.min(a.c, b.c), c2 = Math.max(a.c, b.c), r1 = Math.min(a.r, b.r), r2 = Math.max(a.r, b.r);
+      const vals = []; for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) vals.push(cellAt(ctx, c, r));
+      return { range:true, rows:r2 - r1 + 1, cols:c2 - c1 + 1, vals };
+    }
+    case 'neg': return -num(ev(n.e, ctx));
+    case 'pct': return num(ev(n.e, ctx)) / 100;
+    case 'bin': {
+      const l = ev(n.l, ctx), r = ev(n.r, ctx);
+      if (n.op === '&') return txt(l) + txt(r);
+      if (['=', '<>', '<', '>', '<=', '>='].includes(n.op)) return compare(n.op, l, r);
+      const x = num(l), y = num(r);
+      if (n.op === '+') return x + y; if (n.op === '-') return x - y; if (n.op === '*') return x * y;
+      if (n.op === '/'){ if (y === 0) fail('#DIV/0!', 'Division by zero. The cell you divide by is empty or 0.'); return x / y; }
+      if (n.op === '^') return Math.pow(x, y);
+    }
+    case 'fn': {
+      const f = FN[n.name];
+      if (!f){
+        if (EN_FR[n.name]) fail('#NOM?', `<code>${n.raw}</code> is the English name. In French Excel, write <code>${EN_FR[n.name]}</code>.`);
+        fail('#NOM?', `Excel doesn't know the function <code>${n.raw}</code>. Check the spelling (and the dots, like <code>NB.SI</code>).`);
+      }
+      const A = i => (n.args[i] && n.args[i].t !== 'empty') ? ev(n.args[i], ctx) : null;
+      const has = i => n.args[i] && n.args[i].t !== 'empty';
+      if (f.min !== undefined && n.args.filter(a => a.t !== 'empty').length < f.min)
+        fail('#VALEUR!', `<code>${n.raw}</code> needs more arguments. Syntax: <code>${f.syn}</code>`);
+      return f.run(n.args, A, has, ctx, n);
+    }
+  }
+}
+function evaluate(ast, ctx){ const v = ev(ast, ctx); return scal(v) === null ? 0 : scal(v); }
+
+// --- Helpers for functions ---
+function numsOf(args, ctx){
+  const out = [];
+  for (const a of args){
+    if (a.t === 'empty') continue;
+    const v = ev(a, ctx);
+    if (isRange(v) || a.t === 'ref'){ const arr = isRange(v) ? v.vals : [v]; for (const x of arr) if (typeof x === 'number') out.push(x); }
+    else out.push(num(v));
+  }
+  return out;
+}
+function needRange(v, fname){ if (!isRange(v)) fail('#VALEUR!', `In <code>${fname}</code>, this argument must be a range like <code>A2:A10</code>.`); return v; }
+function makeCrit(c){
+  c = scal(c);
+  if (typeof c === 'number') return x => (typeof x === 'number' && Math.abs(x - c) < 1e-9) || (typeof x === 'string' && parseNumFr(x) === c);
+  if (typeof c === 'boolean') return x => x === c;
+  const s = c === null ? '' : String(c);
+  const m = /^(<=|>=|<>|<|>|=)?([\s\S]*)$/.exec(s); const op = m[1] || '=', val = m[2];
+  const n = parseNumFr(val);
+  if (val !== '' && n !== null) return x => typeof x === 'number' ? compare(op, x, n) : op === '<>';
+  if (val === '') return op === '<>' ? x => x !== null && x !== '' : x => x === null || x === '';
+  if (op === '=' || op === '<>'){
+    const re = new RegExp('^' + val.toLowerCase().replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.') + '$');
+    const hit = x => x !== null && re.test(String(x).toLowerCase());
+    return op === '=' ? hit : x => !hit(x);
+  }
+  return x => typeof x === 'string' && compare(op, x, val);
+}
+function roundHalf(n, d, mode){
+  const f = Math.pow(10, d), a = Number((Math.abs(n) * f).toPrecision(15));
+  const r = mode === 'up' ? Math.ceil(a) : mode === 'down' ? Math.floor(a) : Math.round(a);
+  return Number((Math.sign(n) * r / f).toPrecision(15));
+}
+// Excel dates = number of days since 30 Dec 1899
+const DAY = 86400000, EPOCH = Date.UTC(1899, 11, 30);
+const toSerial = (y, m, d) => (Date.UTC(y, m - 1, d) - EPOCH) / DAY;
+const fromSerial = s => new Date(EPOCH + Math.floor(s) * DAY);
+const DAYS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+const MONTHS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+const pad = (n, w = 2) => String(n).padStart(w, '0');
+function textFormat(v, f){
+  const F = String(f).toLowerCase();
+  if (/[jmad]/.test(F)){
+    const dt = fromSerial(num(v));
+    return F.replace(/jjjj|jjj|jj|j|mmmm|mmm|mm|m|aaaa|aa/g, t => ({
+      jjjj: DAYS_FR[dt.getUTCDay()], jjj: DAYS_FR[dt.getUTCDay()].slice(0, 3) + '.', jj: pad(dt.getUTCDate()), j: dt.getUTCDate(),
+      mmmm: MONTHS_FR[dt.getUTCMonth()], mmm: MONTHS_FR[dt.getUTCMonth()].slice(0, 4) + '.', mm: pad(dt.getUTCMonth() + 1), m: dt.getUTCMonth() + 1,
+      aaaa: dt.getUTCFullYear(), aa: pad(dt.getUTCFullYear() % 100) }[t]));
+  }
+  let n = num(v); const pct = F.includes('%'); if (pct) n *= 100;
+  const dec = (F.split(/[,.]/)[1] || '').replace(/[^0#]/g, '').length;
+  let [i, d] = Math.abs(roundHalf(n, dec)).toFixed(dec).split('.');
+  if (/[#0] [#0]/.test(F)) i = i.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return (n < 0 ? '-' : '') + i + (d ? ',' + d : '') + (pct ? ' %' : '') + (F.includes('$') ? ' $' : '');
+}
+
+// --- The function library (French names). syn = syntax shown in errors ---
+const FN = {
+  'SOMME':      { syn:'SOMME(plage)', run:(g, A, h, c) => numsOf(g, c).reduce((a, b) => a + b, 0) },
+  'MOYENNE':    { syn:'MOYENNE(plage)', run:(g, A, h, c) => { const v = numsOf(g, c); if (!v.length) fail('#DIV/0!', 'MOYENNE found no numbers to average.'); return v.reduce((a, b) => a + b, 0) / v.length; } },
+  'MAX':        { syn:'MAX(plage)', run:(g, A, h, c) => { const v = numsOf(g, c); return v.length ? Math.max(...v) : 0; } },
+  'MIN':        { syn:'MIN(plage)', run:(g, A, h, c) => { const v = numsOf(g, c); return v.length ? Math.min(...v) : 0; } },
+  'NB':         { syn:'NB(plage)', run:(g, A, h, c) => { let k = 0; for (const a of g){ if (a.t === 'empty') continue; const v = ev(a, c); (isRange(v) ? v.vals : [v]).forEach(x => { if (typeof x === 'number') k++; }); } return k; } },
+  'NBVAL':      { syn:'NBVAL(plage)', run:(g, A, h, c) => { let k = 0; for (const a of g){ if (a.t === 'empty') continue; const v = ev(a, c); (isRange(v) ? v.vals : [v]).forEach(x => { if (x !== null) k++; }); } return k; } },
+  'SI':         { min:1, syn:'SI(test;valeur_si_vrai;valeur_si_faux)', run:(g, A, h) => bool(A(0)) ? (h(1) ? scal(A(1)) : (g.length > 1 ? 0 : true)) : (g.length > 2 ? (h(2) ? scal(A(2)) : 0) : false) },
+  'ET':         { min:1, syn:'ET(test1;test2;...)', run:(g, A, h, c) => g.filter(a => a.t !== 'empty').every(a => { const v = ev(a, c); return isRange(v) ? v.vals.filter(x => x !== null).every(bool) : bool(v); }) },
+  'OU':         { min:1, syn:'OU(test1;test2;...)', run:(g, A, h, c) => g.filter(a => a.t !== 'empty').some(a => { const v = ev(a, c); return isRange(v) ? v.vals.filter(x => x !== null).some(bool) : bool(v); }) },
+  'NON':        { min:1, syn:'NON(test)', run:(g, A) => !bool(A(0)) },
+  'SIERREUR':   { min:1, syn:'SIERREUR(valeur;valeur_si_erreur)', run:(g, A) => { try { return scal(A(0)); } catch (e){ if (e instanceof XErr && e.code !== 'PARSE') return scal(A(1)); throw e; } } },
+  'RECHERCHEX': { min:3, syn:'RECHERCHEX(valeur_cherchée;plage_recherche;plage_résultat;[si_introuvable];[mode])', run:(g, A, h) => {
+      const val = scal(A(0)), look = needRange(A(1), 'RECHERCHEX'), ret = needRange(A(2), 'RECHERCHEX'), mode = h(4) ? num(A(4)) : 0;
+      if (ret.vals.length !== look.vals.length && ret.rows !== look.rows) fail('#VALEUR!', 'In RECHERCHEX, the search range and the result range must be the same size.');
+      let idx = look.vals.findIndex(x => x !== null && compare('=', x, val));
+      if (idx < 0 && mode === -1){ let best = -1; look.vals.forEach((x, i) => { if (x !== null && rank(x) === rank(val) && compare('<', x, val) && (best < 0 || compare('>', x, look.vals[best]))) best = i; }); idx = best; }
+      if (idx < 0 && mode === 1){ let best = -1; look.vals.forEach((x, i) => { if (x !== null && rank(x) === rank(val) && compare('>', x, val) && (best < 0 || compare('<', x, look.vals[best]))) best = i; }); idx = best; }
+      if (idx < 0){ if (h(3)) return scal(A(3)); fail('#N/A', `RECHERCHEX didn't find <code>${txt(val)}</code> in the search range.`); }
+      return ret.vals.length === look.vals.length ? ret.vals[idx] : ret.vals[idx * ret.cols]; } },
+  'RECHERCHEV': { min:3, syn:'RECHERCHEV(valeur_cherchée;table;no_colonne;[FAUX])', run:(g, A, h) => {
+      const val = scal(A(0)), tb = needRange(A(1), 'RECHERCHEV'), col = num(A(2)), approx = h(3) ? bool(A(3)) : true;
+      if (col < 1 || col > tb.cols) fail('#REF!', `Column ${col} doesn't exist in this table.`);
+      let found = -1;
+      for (let r = 0; r < tb.rows; r++){ const x = tb.vals[r * tb.cols];
+        if (x !== null && compare('=', x, val)){ found = r; break; }
+        if (approx && x !== null && rank(x) === rank(val) && compare('<', x, val)) found = r; }
+      if (found < 0) fail('#N/A', `RECHERCHEV didn't find <code>${txt(val)}</code>.`);
+      return tb.vals[found * tb.cols + col - 1]; } },
+  'NB.SI':      { min:2, syn:'NB.SI(plage;critère)', run:(g, A) => { const r = needRange(A(0), 'NB.SI'), t = makeCrit(A(1)); return r.vals.filter(t).length; } },
+  'SOMME.SI':   { min:2, syn:'SOMME.SI(plage_critère;critère;[plage_somme])', run:(g, A, h) => { const r = needRange(A(0), 'SOMME.SI'), t = makeCrit(A(1)), s = h(2) ? needRange(A(2), 'SOMME.SI') : r;
+      return r.vals.reduce((acc, x, i) => acc + (t(x) && typeof s.vals[i] === 'number' ? s.vals[i] : 0), 0); } },
+  'MOYENNE.SI': { min:2, syn:'MOYENNE.SI(plage_critère;critère;[plage_moyenne])', run:(g, A, h) => { const r = needRange(A(0), 'MOYENNE.SI'), t = makeCrit(A(1)), s = h(2) ? needRange(A(2), 'MOYENNE.SI') : r;
+      const v = r.vals.map((x, i) => t(x) ? s.vals[i] : null).filter(x => typeof x === 'number'); if (!v.length) fail('#DIV/0!', 'Nothing matched the criterion, so there is nothing to average.'); return v.reduce((a, b) => a + b, 0) / v.length; } },
+  'NB.SI.ENS':  { min:2, syn:'NB.SI.ENS(plage1;critère1;plage2;critère2;...)', run:(g, A) => { const pairs = []; for (let i = 0; i < g.length; i += 2) pairs.push([needRange(A(i), 'NB.SI.ENS'), makeCrit(A(i + 1))]);
+      return pairs[0][0].vals.filter((x, k) => pairs.every(([r, t]) => t(r.vals[k]))).length; } },
+  'SOMME.SI.ENS': { min:3, syn:'SOMME.SI.ENS(plage_somme;plage1;critère1;...)', run:(g, A) => { const s = needRange(A(0), 'SOMME.SI.ENS'), pairs = []; for (let i = 1; i < g.length; i += 2) pairs.push([needRange(A(i), 'SOMME.SI.ENS'), makeCrit(A(i + 1))]);
+      return s.vals.reduce((acc, x, k) => acc + (typeof x === 'number' && pairs.every(([r, t]) => t(r.vals[k])) ? x : 0), 0); } },
+  'AUJOURDHUI': { syn:'AUJOURDHUI()', run:() => { const d = new Date(); return toSerial(d.getFullYear(), d.getMonth() + 1, d.getDate()); } },
+  'MAINTENANT': { syn:'MAINTENANT()', run:() => { const d = new Date(); return toSerial(d.getFullYear(), d.getMonth() + 1, d.getDate()) + (d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds()) / 86400; } },
+  'JOUR':       { min:1, syn:'JOUR(date)', run:(g, A) => fromSerial(num(A(0))).getUTCDate() },
+  'MOIS':       { min:1, syn:'MOIS(date)', run:(g, A) => fromSerial(num(A(0))).getUTCMonth() + 1 },
+  'ANNEE':      { min:1, syn:'ANNEE(date)', run:(g, A) => fromSerial(num(A(0))).getUTCFullYear() },
+  'JOURSEM':    { min:1, syn:'JOURSEM(date;[type])', run:(g, A, h) => { const d = fromSerial(num(A(0))).getUTCDay(), t = h(1) ? num(A(1)) : 1;
+      if (t === 1) return d + 1; if (t === 2) return d === 0 ? 7 : d; if (t === 3) return d === 0 ? 6 : d - 1; fail('#NOMBRE!', 'The type for JOURSEM should be 1, 2 or 3.'); } },
+  'DATE':       { min:3, syn:'DATE(année;mois;jour)', run:(g, A) => toSerial(num(A(0)), num(A(1)), num(A(2))) },
+  'TEXTE':      { min:2, syn:'TEXTE(valeur;"format")', run:(g, A) => textFormat(A(0), txt(A(1))) },
+  'GAUCHE':     { min:1, syn:'GAUCHE(texte;[nb_car])', run:(g, A, h) => { const n = h(1) ? num(A(1)) : 1; if (n < 0) fail('#VALEUR!', 'The number of characters can\'t be negative.'); return txt(A(0)).slice(0, n); } },
+  'DROITE':     { min:1, syn:'DROITE(texte;[nb_car])', run:(g, A, h) => { const n = h(1) ? num(A(1)) : 1; if (n < 0) fail('#VALEUR!', 'The number of characters can\'t be negative.'); return n === 0 ? '' : txt(A(0)).slice(-n); } },
+  'STXT':       { min:3, syn:'STXT(texte;début;nb_car)', run:(g, A) => { const s = num(A(1)), n = num(A(2)); if (s < 1 || n < 0) fail('#VALEUR!', 'In STXT, the start must be 1 or more.'); return txt(A(0)).substr(s - 1, n); } },
+  'NBCAR':      { min:1, syn:'NBCAR(texte)', run:(g, A) => txt(A(0)).length },
+  'TROUVE':     { min:2, syn:'TROUVE(texte_cherché;texte;[début])', run:(g, A, h) => { const i = txt(A(1)).indexOf(txt(A(0)), (h(2) ? num(A(2)) : 1) - 1); if (i < 0) fail('#VALEUR!', `TROUVE didn't find <code>${txt(A(0))}</code>. Remember: TROUVE cares about capitals.`); return i + 1; } },
+  'CHERCHE':    { min:2, syn:'CHERCHE(texte_cherché;texte;[début])', run:(g, A, h) => { const i = txt(A(1)).toLowerCase().indexOf(txt(A(0)).toLowerCase(), (h(2) ? num(A(2)) : 1) - 1); if (i < 0) fail('#VALEUR!', `CHERCHE didn't find <code>${txt(A(0))}</code>.`); return i + 1; } },
+  'MAJUSCULE':  { min:1, syn:'MAJUSCULE(texte)', run:(g, A) => txt(A(0)).toUpperCase() },
+  'MINUSCULE':  { min:1, syn:'MINUSCULE(texte)', run:(g, A) => txt(A(0)).toLowerCase() },
+  'NOMPROPRE':  { min:1, syn:'NOMPROPRE(texte)', run:(g, A) => txt(A(0)).toLowerCase().replace(/(^|[^a-zà-ÿ])([a-zà-ÿ])/g, (m, a, b) => a + b.toUpperCase()) },
+  'SUPPRESPACE':{ min:1, syn:'SUPPRESPACE(texte)', run:(g, A) => txt(A(0)).trim().replace(/ +/g, ' ') },
+  'CONCAT':     { min:1, syn:'CONCAT(texte1;texte2;...)', run:(g, A, h, c) => g.map(a => { if (a.t === 'empty') return ''; const v = ev(a, c); return isRange(v) ? v.vals.map(txt).join('') : txt(v); }).join('') },
+  'ARRONDI':    { min:2, syn:'ARRONDI(nombre;nb_décimales)', run:(g, A) => roundHalf(num(A(0)), num(A(1))) },
+  'ARRONDI.SUP':{ min:2, syn:'ARRONDI.SUP(nombre;nb_décimales)', run:(g, A) => roundHalf(num(A(0)), num(A(1)), 'up') },
+  'ARRONDI.INF':{ min:2, syn:'ARRONDI.INF(nombre;nb_décimales)', run:(g, A) => roundHalf(num(A(0)), num(A(1)), 'down') },
+  'ENT':        { min:1, syn:'ENT(nombre)', run:(g, A) => Math.floor(num(A(0))) },
+  'ABS':        { min:1, syn:'ABS(nombre)', run:(g, A) => Math.abs(num(A(0))) },
+  'MOD':        { min:2, syn:'MOD(nombre;diviseur)', run:(g, A) => { const n = num(A(0)), d = num(A(1)); if (d === 0) fail('#DIV/0!', 'MOD by zero.'); return n - d * Math.floor(n / d); } },
+  'ALEA':       { syn:'ALEA()', run:() => Math.random() },
+  'ALEA.ENTRE.BORNES': { min:2, syn:'ALEA.ENTRE.BORNES(min;max)', run:(g, A) => { const a = Math.ceil(num(A(0))), b = Math.floor(num(A(1))); if (a > b) fail('#NOMBRE!', 'The min is bigger than the max.'); return a + Math.floor(Math.random() * (b - a + 1)); } },
+};
+FN['CONCATENER'] = { ...FN['CONCAT'], syn:'CONCATENER(texte1;texte2;...)' };
+
+function collect(ast, out = { fns:new Set(), refs:0 }){
+  if (!ast || typeof ast !== 'object') return out;
+  if (ast.t === 'fn') out.fns.add(ast.name);
+  if (ast.t === 'ref' || ast.t === 'range') out.refs++;
+  for (const k of ['l', 'r', 'e']) if (ast[k]) collect(ast[k], out);
+  if (ast.args) ast.args.forEach(a => collect(a, out));
+  return out;
+}
+
+/* ==================================================================
+   PART B — THE EXERCISES
+   grid = rows starting at A1. D(y,m,d) = a date. fill = cells the
+   formula gets copied to (like dragging the fill handle).
+   ================================================================== */
+const D = (y, m, d) => ({ date:toSerial(y, m, d) });
+
+const TOPICS = [
+  { id:'bases',     name:'Basics & the $',       sub:'SOMME, MOYENNE, MAX, MIN, NB, NBVAL, absolute refs', week:'Week 8' },
+  { id:'logique',   name:'Logic: SI, ET, OU',    sub:'Tests, nested SI',                               week:'Week 8' },
+  { id:'recherche', name:'Lookup & count',       sub:'RECHERCHEX, NB.SI, SOMME.SI',                    week:'Week 9' },
+  { id:'dates',     name:'Dates',                sub:'AUJOURDHUI, ANNEE, MOIS, JOURSEM, DATE',         week:'Week 11' },
+  { id:'texte',     name:'Text',                 sub:'GAUCHE, DROITE, STXT, NBCAR, TROUVE, TEXTE',     week:'Week 11' },
+  { id:'divers',    name:'Rounding & random',    sub:'ARRONDI, ENT, ALEA, ALEA.ENTRE.BORNES',          week:'Week 12' },
+  { id:'outils',    name:'Excel tools (quiz)',   sub:'Pivot tables, filters, validation, protection, charts', week:'Weeks 8–12' },
+];
+
+const GRADES = [['Élève','Note'],['Léa',78],['Samuel',54],['Maya',91],['Noah',60],['Chloé',47]];
+const REGIONS = [['Vendeur','Région','Ventes'],['Alex','Nord',4200],['Bea','Sud',3100],['Carl','Nord',5600],['Dina','Est',2100],['Émile','Sud',2800],['Fanny','Nord',1900]];
+const EMAILS = [['lea.roy@cstj.qc.ca'],['sam@gmail.com'],['maya.b@outlook.com']];
+
+const EX = [
+  // ---------- BASICS ----------
+  { id:'b1', topic:'bases', title:'Add it all up', task:'In <b>B8</b>, calculate the total of all the sales.',
+    grid:[['Mois','Ventes'],['Janvier',1250],['Février',980],['Mars',1430],['Avril',1100],['Mai',1675],['Juin',1520],['Total']],
+    target:'B8', sol:'=SOMME(B2:B7)', mustUse:['SOMME'], fmts:{B:'$'}, hint:'<code>SOMME(first cell:last cell)</code>' },
+  { id:'b2', topic:'bases', title:'Class average', task:'In <b>B7</b>, calculate the average grade.',
+    grid:[...GRADES,['Moyenne']], target:'B7', sol:'=MOYENNE(B2:B6)', mustUse:['MOYENNE'], hint:'<code>MOYENNE(B2:B6)</code> works like SOMME.' },
+  { id:'b3', topic:'bases', title:'Hottest day', task:'In <b>B7</b>, find the highest temperature.',
+    grid:[['Jour','Temp. (°C)'],['Lundi',12],['Mardi',17],['Mercredi',9],['Jeudi',21],['Vendredi',15],['Plus chaud'],['Plus froid']],
+    target:'B7', sol:'=MAX(B2:B6)', mustUse:['MAX'], hint:'The biggest value = <code>MAX</code>.' },
+  { id:'b4', topic:'bases', title:'Coldest day', task:'In <b>B8</b>, find the lowest temperature.',
+    grid:[['Jour','Temp. (°C)'],['Lundi',12],['Mardi',17],['Mercredi',9],['Jeudi',21],['Vendredi',15],['Plus chaud',21],['Plus froid']],
+    target:'B8', sol:'=MIN(B2:B6)', mustUse:['MIN'], hint:'The smallest value = <code>MIN</code>.' },
+  { id:'b5', topic:'bases', title:'Count the grades', task:'In <b>B7</b>, count how many students have a <i>numeric</i> grade (skip the "Absent").',
+    grid:[['Élève','Examen'],['Léa',78],['Samuel','Absent'],['Maya',91],['Noah','Absent'],['Chloé',82],['Nb de notes']],
+    target:'B7', sol:'=NB(B2:B6)', mustUse:['NB'], hint:'<code>NB</code> counts only cells that contain numbers.' },
+  { id:'b6', topic:'bases', title:'Count the students', task:'In <b>B8</b>, count how many students are in the list (count the names in column A).',
+    grid:[['Élève','Examen'],['Léa',78],['Samuel','Absent'],['Maya',91],['Noah','Absent'],['Chloé',82],['Nb de notes',3],['Nb d\'élèves']],
+    target:'B8', sol:'=NBVAL(A2:A6)', mustUse:['NBVAL'], hint:'<code>NBVAL</code> counts every cell that is not empty — text too.' },
+  { id:'b7', topic:'bases', title:'Line totals', task:'In <b>D2</b>, multiply the quantity by the unit price. Your formula will be copied down to <b>D5</b>.',
+    grid:[['Article','Qté','Prix unitaire','Total'],['Café',3,2.75],['Muffin',2,3.5],['Thé',1,2.25],['Croissant',4,3.1]],
+    fill:'D2:D5', sol:'=B2*C2', fmts:{C:'$', D:'$'}, hint:'Just <code>=B2*C2</code>. Relative references move by themselves when copied.' },
+  { id:'b8', topic:'bases', title:'Lock the tax rate', task:'In <b>C2</b>, calculate the price with taxes, using the rate in <b>F1</b>. It will be copied down to <b>C5</b> — lock what must not move!',
+    grid:[['Produit','Prix','Prix + taxes','','Taxes',0.15],['Clavier',49.99],['Souris',24.5],['Écran',219],['Câble HDMI',12.75]],
+    fill:'C2:C5', sol:'=B2*(1+$F$1)', fmts:{B:'$', C:'$', F1:'pct'}, hint:'Price × (1 + rate). The rate cell must stay put when copied: <code>$F$1</code>.' },
+  { id:'b9', topic:'bases', title:'Share of the total', task:'In <b>C2</b>, calculate each seller\'s share of the total in <b>B6</b>. It will be copied down to <b>C5</b>.',
+    grid:[['Vendeur','Ventes','% du total'],['Alex',4200],['Bea',3100],['Carl',5600],['Dina',2100],['Total',15000]],
+    fill:'C2:C5', sol:'=B2/$B$6', fmts:{B:'$', C:'pct'}, hint:'Divide by the total, and lock the total: <code>/$B$6</code>.' },
+  { id:'bq1', topic:'bases', type:'mcq', q:'You copy <code>=B2*$F$1</code> one row down. What does it become?',
+    options:['<code>=B3*$F$1</code>', '<code>=B3*$F$2</code>', '<code>=B2*$F$1</code>', '<code>=B3*F2</code>'], answer:0,
+    why:'B2 is relative, so it moves to B3. $F$1 is locked, so it stays.' },
+  { id:'bq2', topic:'bases', type:'mcq', q:'What does the <code>$</code> lock in <code>$A1</code>?',
+    options:['Only the column (A)', 'Only the row (1)', 'Both the column and the row', 'Nothing'], answer:0,
+    why:'The $ locks whatever comes right after it. <code>$A1</code> = column locked. <code>A$1</code> = row locked. <code>$A$1</code> = both.' },
+  { id:'bq3', topic:'bases', type:'mcq', q:'While editing a formula, which key adds the <code>$</code> signs to a reference for you?',
+    options:['F4', 'F2', 'F9', 'Ctrl + $'], answer:0, why:'F4 cycles through $A$1 → A$1 → $A1 → A1. (F2 = edit the cell.)' },
+
+  // ---------- LOGIC ----------
+  { id:'l1', topic:'logique', title:'Pass or fail', task:'In <b>C2</b>, show <code>"Réussi"</code> if the grade is 60 or more, otherwise <code>"Échec"</code>. Copied down to <b>C6</b>.',
+    grid:[['Élève','Note','Résultat'],...GRADES.slice(1)], fill:'C2:C6', sol:'=SI(B2>=60;"Réussi";"Échec")', mustUse:['SI'],
+    hint:'<code>SI(test;if true;if false)</code>. Text goes between quotes.' },
+  { id:'l2', topic:'logique', title:'Sales bonus', task:'In <b>C2</b>: bonus of <b>250</b> if sales are <i>more than</i> 5000, otherwise <b>0</b>. Copied down to <b>C5</b>.',
+    grid:[['Vendeur','Ventes','Bonus'],['Alex',6200],['Bea',4300],['Carl',5000],['Dina',7800]], fill:'C2:C5', sol:'=SI(B2>5000;250;0)', mustUse:['SI'], fmts:{B:'$', C:'$'},
+    hint:'"More than" is <code>&gt;</code>, not <code>&gt;=</code>. Look at Carl.' },
+  { id:'l3', topic:'logique', title:'Commission', task:'In <b>C2</b>: if sales are 5000 or more, commission = 5% of sales. Otherwise 2% of sales. Copied down to <b>C5</b>.',
+    grid:[['Vendeur','Ventes','Commission'],['Alex',6200],['Bea',4300],['Carl',5000],['Dina',1800]], fill:'C2:C5', sol:'=SI(B2>=5000;B2*5%;B2*2%)', mustUse:['SI'], fmts:{B:'$', C:'$'},
+    hint:'The true/false parts can be calculations: <code>B2*5%</code> or <code>B2*0,05</code>.' },
+  { id:'l4', topic:'logique', title:'Two conditions (ET)', task:'In <b>D2</b>: <code>"Admis"</code> if the person is 18 or older <b>AND</b> has a permit ("Oui"). Otherwise <code>"Refusé"</code>. Copied down to <b>D5</b>.',
+    grid:[['Candidat','Âge','Permis','Admis?'],['Jade',19,'Oui'],['Omar',17,'Oui'],['Lina',22,'Non'],['Théo',25,'Oui']], fill:'D2:D5',
+    sol:'=SI(ET(B2>=18;C2="Oui");"Admis";"Refusé")', mustUse:['SI', 'ET'], hint:'Put <code>ET(test1;test2)</code> as the test of your SI.' },
+  { id:'l5', topic:'logique', title:'Either one (OU)', task:'In <b>D2</b>: delivery is <b>0</b> if the order is 50 or more <b>OR</b> the client is a member. Otherwise <b>8</b>. Copied down to <b>D5</b>.',
+    grid:[['Client','Commande','Membre','Livraison'],['Ana',62,'Non'],['Ben',35,'Oui'],['Cléo',28,'Non'],['Dan',80,'Oui']], fill:'D2:D5',
+    sol:'=SI(OU(B2>=50;C2="Oui");0;8)', mustUse:['SI', 'OU'], fmts:{B:'$', D:'$'}, hint:'<code>SI(OU(test1;test2);0;8)</code>' },
+  { id:'l6', topic:'logique', title:'Nested SI', task:'In <b>C2</b>: <code>"Excellent"</code> if 85 or more, <code>"Bon"</code> if 60 or more, otherwise <code>"Échec"</code>. Copied down to <b>C6</b>.',
+    grid:[['Élève','Note','Mention'],['Léa',92],['Samuel',74],['Maya',58],['Noah',85],['Chloé',60]], fill:'C2:C6',
+    sol:'=SI(B2>=85;"Excellent";SI(B2>=60;"Bon";"Échec"))', mustUse:['SI'], hint:'Test the biggest first. The "if false" part is another SI.' },
+  { id:'lq1', topic:'logique', type:'mcq', q:'<code>=SI(B2>=60;"Réussi";"Échec")</code> — B2 contains <b>60</b>. What shows up?',
+    options:['Réussi', 'Échec', 'VRAI', '#VALEUR!'], answer:0, why:'60 >= 60 is true, so you get the "if true" value.' },
+  { id:'lq2', topic:'logique', type:'mcq', q:'What\'s wrong with <code>=SI(A1>=60;"Bon";SI(A1>=85;"Excellent";"Échec"))</code>?',
+    options:['A 90 shows "Bon" — the biggest test must come first', 'It\'s a syntax error', 'SI can\'t go inside another SI', 'Nothing, it works'], answer:0,
+    why:'90 >= 60 is already true, so Excel stops there and never checks 85.' },
+  { id:'lq3', topic:'logique', type:'mcq', q:'What does <code>=ET(VRAI;FAUX)</code> give?',
+    options:['FAUX', 'VRAI', '#VALEUR!', '0,5'], answer:0, why:'ET needs <i>every</i> test true. OU needs only one — <code>OU(VRAI;FAUX)</code> gives VRAI.' },
+
+  // ---------- LOOKUP & COUNT ----------
+  { id:'r1', topic:'recherche', title:'Find the price', task:'In <b>F2</b>, find the price of the product code typed in <b>E2</b>.',
+    grid:[['Code','Produit','Prix','','Code cherché','Prix'],['P01','Clavier',49.99,'','P03'],['P02','Souris',24.5],['P03','Écran',219],['P04','Webcam',65],['P05','Casque',89.95]],
+    target:'F2', sol:'=RECHERCHEX(E2;A2:A6;C2:C6)', mustUse:['RECHERCHEX'], fmts:{C:'$', F:'$'},
+    hint:'<code>RECHERCHEX(what;where to look;what to return)</code>' },
+  { id:'r2', topic:'recherche', title:'Not found?', task:'In <b>F2</b>, find the <i>product name</i> for the code in <b>E2</b>. If the code doesn\'t exist, show <code>"Introuvable"</code>.',
+    grid:[['Code','Produit','Prix','','Code cherché','Produit'],['P01','Clavier',49.99,'','P09'],['P02','Souris',24.5],['P03','Écran',219],['P04','Webcam',65],['P05','Casque',89.95]],
+    target:'F2', sol:'=RECHERCHEX(E2;A2:A6;B2:B6;"Introuvable")', mustUse:['RECHERCHEX'], fmts:{C:'$'},
+    hint:'RECHERCHEX has a 4th argument: what to show if nothing is found.' },
+  { id:'r3', topic:'recherche', title:'Letter grade (challenge)', task:'In <b>F2</b>, find the letter for the grade in <b>E2</b> using the table A1:B6. A grade gets the letter of the closest "Note min" <i>at or below</i> it. Copied down to <b>F5</b>.',
+    grid:[['Note min','Lettre','','Élève','Note','Lettre'],[0,'E','','Léa',84],[60,'D','','Sam',59],[70,'C','','Maya',90],[80,'B','','Noah',71],[90,'A']],
+    fill:'F2:F5', sol:'=RECHERCHEX(E2;$A$2:$A$6;$B$2:$B$6;;-1)', mustUse:['RECHERCHEX'],
+    hint:'Mode <code>-1</code> = exact or next smaller. Skip the 4th argument with <code>;;</code>. And lock the table with <code>$</code>!' },
+  { id:'r4', topic:'recherche', title:'Count a city', task:'In <b>B9</b>, count how many clients live in <code>"Montréal"</code>.',
+    grid:[['Client','Ville'],['Ana','Montréal'],['Ben','Laval'],['Cléo','Montréal'],['Dan','Saint-Jérôme'],['Éva','Montréal'],['Fred','Laval'],[],['À Montréal']],
+    target:'B9', sol:'=NB.SI(B2:B7;"Montréal")', mustUse:['NB.SI'], hint:'<code>NB.SI(range;criterion)</code>' },
+  { id:'r5', topic:'recherche', title:'Count who passed', task:'In <b>B7</b>, count how many students got <b>60 or more</b>.',
+    grid:[...GRADES,['Ont réussi']], target:'B7', sol:'=NB.SI(B2:B6;">=60")', mustUse:['NB.SI'],
+    hint:'A comparison criterion goes in quotes: <code>"&gt;=60"</code>' },
+  { id:'r6', topic:'recherche', title:'Total for one region', task:'In <b>C9</b>, add up the sales of the <code>"Nord"</code> region only.',
+    grid:[...REGIONS,[],['Total Nord']], target:'C9', sol:'=SOMME.SI(B2:B7;"Nord";C2:C7)', mustUse:['SOMME.SI'], fmts:{C:'$'},
+    hint:'<code>SOMME.SI(where to check;criterion;what to add)</code>' },
+  { id:'r7', topic:'recherche', title:'Summary table', task:'In <b>F2</b>, total the sales for the region written in <b>E2</b>. Copied down to <b>F4</b>.',
+    grid:REGIONS.map((r, i) => i === 0 ? [...r, '', 'Région', 'Total'] : i <= 3 ? [...r, '', ['Nord', 'Sud', 'Est'][i - 1]] : r),
+    fill:'F2:F4', sol:'=SOMME.SI($B$2:$B$7;E2;$C$2:$C$7)', mustUse:['SOMME.SI'], fmts:{C:'$', F:'$'},
+    hint:'The criterion can be a cell (E2, relative). The two ranges must be locked with <code>$</code>.' },
+  { id:'rq1', topic:'recherche', type:'mcq', q:'RECHERCHEX shows <code>#N/A</code>. What does it usually mean?',
+    options:['The value you searched for wasn\'t found', 'You divided by zero', 'The function name is misspelled', 'The cell is too narrow'], answer:0,
+    why:'#N/A = "not available". Tip: add a 4th argument like <code>"Introuvable"</code>. (Misspelled function = #NOM?)' },
+  { id:'rq2', topic:'recherche', type:'mcq', q:'In NB.SI, how do you write the criterion "greater than 100"?',
+    options:['<code>"&gt;100"</code>', '<code>&gt;100</code>', '<code>"100&gt;"</code>', '<code>(&gt;100)</code>'], answer:0,
+    why:'Comparison criteria are text, so they go in quotes. With a cell: <code>"&gt;"&amp;E1</code>.' },
+
+  // ---------- DATES ----------
+  { id:'d1', topic:'dates', title:'Today', task:'In <b>B1</b>, show today\'s date. It must update by itself every day.',
+    grid:[['Aujourd\'hui']], target:'B1', sol:'=AUJOURDHUI()', mustUse:['AUJOURDHUI'], noRef:true, fmts:{B1:'date'},
+    hint:'No arguments, but the parentheses are still needed: <code>AUJOURDHUI()</code>' },
+  { id:'d2', topic:'dates', title:'Hiring year', task:'In <b>C2</b>, extract the year from the hiring date. Copied down to <b>C5</b>.',
+    grid:[['Employé','Embauche','Année'],['Léa',D(2019,3,14)],['Sam',D(2021,11,2)],['Maya',D(2016,6,30)],['Noah',D(2024,1,8)]],
+    fill:'C2:C5', sol:'=ANNEE(B2)', mustUse:['ANNEE'], hint:'<code>ANNEE(date)</code> — no accent in the function name.' },
+  { id:'d3', topic:'dates', title:'Hiring month', task:'In <b>C2</b>, extract the month number. Copied down to <b>C5</b>.',
+    grid:[['Employé','Embauche','Mois'],['Léa',D(2019,3,14)],['Sam',D(2021,11,2)],['Maya',D(2016,6,30)],['Noah',D(2024,1,8)]],
+    fill:'C2:C5', sol:'=MOIS(B2)', mustUse:['MOIS'], hint:'<code>MOIS(date)</code>' },
+  { id:'d4', topic:'dates', title:'Due date', task:'In <b>C2</b>, the invoice is due <b>30 days</b> after its date. Copied down to <b>C4</b>.',
+    grid:[['Facture','Date','Échéance'],['F-101',D(2026,9,1)],['F-102',D(2026,9,15)],['F-103',D(2026,10,20)]],
+    fill:'C2:C4', sol:'=B2+30', fmts:{C:'date'}, hint:'Dates are numbers of days. Just add 30!' },
+  { id:'d5', topic:'dates', title:'Delivery time', task:'In <b>D2</b>, calculate how many days the delivery took. Copied down to <b>D4</b>.',
+    grid:[['Commande','Commandé','Livré','Jours'],['#101',D(2026,9,1),D(2026,9,8)],['#102',D(2026,9,3),D(2026,9,17)],['#103',D(2026,9,10),D(2026,9,12)]],
+    fill:'D2:D4', sol:'=C2-B2', hint:'Later date minus earlier date = number of days.' },
+  { id:'d6', topic:'dates', title:'Day of the week', task:'In <b>C2</b>, show the weekday number, with <b>Monday = 1</b>. Copied down to <b>C5</b>.',
+    grid:[['Rendez-vous','Date','Jour (lun=1)'],['Dentiste',D(2026,10,5)],['Garage',D(2026,10,10)],['Coiffure',D(2026,10,14)],['Examen',D(2026,12,11)]],
+    fill:'C2:C5', sol:'=JOURSEM(B2;2)', mustUse:['JOURSEM'], hint:'<code>JOURSEM(date;2)</code> — type 2 means Monday = 1.' },
+  { id:'d7', topic:'dates', title:'Build a date', task:'In <b>D2</b>, build a real date from the year, month and day. Copied down to <b>D4</b>.',
+    grid:[['Année','Mois','Jour','Date'],[2026,9,24],[2026,12,25],[2027,2,14]], fill:'D2:D4', sol:'=DATE(A2;B2;C2)', mustUse:['DATE'], fmts:{D:'date'},
+    hint:'<code>DATE(year;month;day)</code> — in that order.' },
+  { id:'d8', topic:'dates', title:'Age (approx.)', task:'In <b>C2</b>, calculate the age: this year minus the birth year. Use today\'s date so it stays current. Copied down to <b>C4</b>.',
+    grid:[['Nom','Naissance','Âge'],['Léa',D(2005,4,12)],['Sam',D(1998,10,30)],['Maya',D(2007,1,3)]],
+    fill:'C2:C4', sol:'=ANNEE(AUJOURDHUI())-ANNEE(B2)', mustUse:['ANNEE', 'AUJOURDHUI'], hint:'<code>ANNEE(AUJOURDHUI())</code> gives this year.' },
+  { id:'dq1', topic:'dates', type:'mcq', q:'How does Excel store a date behind the scenes?',
+    options:['As a number of days since 1900', 'As text', 'As seconds since 1970', 'As a picture of a calendar'], answer:0,
+    why:'That\'s why you can add days to a date, or subtract two dates.' },
+  { id:'dq2', topic:'dates', type:'mcq', q:'What\'s the difference between <code>AUJOURDHUI()</code> and <code>MAINTENANT()</code>?',
+    options:['MAINTENANT also includes the time', 'AUJOURDHUI also includes the time', 'MAINTENANT never updates', 'None, they\'re the same'], answer:0,
+    why:'AUJOURDHUI = date only. MAINTENANT = date + hour. Both update when the sheet recalculates.' },
+
+  // ---------- TEXT ----------
+  { id:'t1', topic:'texte', title:'Category code', task:'In <b>B2</b>, extract the first <b>3</b> letters of the product code. Copied down to <b>B4</b>.',
+    grid:[['Code produit','Catégorie'],['ABC-2045'],['XYZ-1180'],['KLM-3302']], fill:'B2:B4', sol:'=GAUCHE(A2;3)', mustUse:['GAUCHE'], hint:'<code>GAUCHE(text;how many)</code>' },
+  { id:'t2', topic:'texte', title:'Product number', task:'In <b>B2</b>, extract the last <b>4</b> characters. Copied down to <b>B4</b>.',
+    grid:[['Code produit','Numéro'],['ABC-2045'],['XYZ-1180'],['KLM-3302']], fill:'B2:B4', sol:'=DROITE(A2;4)', mustUse:['DROITE'], hint:'<code>DROITE(text;how many)</code>' },
+  { id:'t3', topic:'texte', title:'From the middle', task:'In <b>B2</b>, extract the province (the 2 letters starting at position 4). Copied down to <b>B4</b>.',
+    grid:[['Dossier','Province'],['CA-QC-2026-0042'],['CA-ON-2025-0107'],['CA-BC-2026-0311']], fill:'B2:B4', sol:'=STXT(A2;4;2)', mustUse:['STXT'], hint:'<code>STXT(text;start;how many)</code>' },
+  { id:'t4', topic:'texte', title:'Password length', task:'In <b>B2</b>, count how many characters are in the password. Copied down to <b>B4</b>.',
+    grid:[['Mot de passe','Longueur'],['chat123'],['Miaou!2026'],['cafe']], fill:'B2:B4', sol:'=NBCAR(A2)', mustUse:['NBCAR'], hint:'<code>NBCAR(text)</code>' },
+  { id:'t5', topic:'texte', title:'Where\'s the @?', task:'In <b>B2</b>, find the position of the <code>@</code> in the email. Copied down to <b>B4</b>.',
+    grid:[['Courriel','Position du @'],...EMAILS], fill:'B2:B4', sol:'=TROUVE("@";A2)', mustUse:['TROUVE'], hint:'<code>TROUVE(what;in which text)</code> — what you search comes first.' },
+  { id:'t6', topic:'texte', title:'Username (nested)', task:'In <b>B2</b>, extract everything <i>before</i> the <code>@</code>. Copied down to <b>B4</b>.',
+    grid:[['Courriel','Utilisateur'],...EMAILS], fill:'B2:B4', sol:'=GAUCHE(A2;TROUVE("@";A2)-1)', mustUse:['GAUCHE', 'TROUVE'],
+    hint:'GAUCHE needs "how many". That\'s the position of the @, minus 1.' },
+  { id:'t7', topic:'texte', title:'Full name', task:'In <b>C2</b>, join the first and last name with a space between. Copied down to <b>C4</b>.',
+    grid:[['Prénom','Nom','Nom complet'],['Léa','Roy'],['Samuel','Gagnon'],['Maya','Tremblay']], fill:'C2:C4', sol:'=A2&" "&B2', hint:'<code>&amp;</code> glues text together. The space is <code>" "</code>.' },
+  { id:'t8', topic:'texte', title:'Month in letters', task:'In <b>B2</b>, show the month of the date written in full (like "janvier"). Copied down to <b>B4</b>.',
+    grid:[['Date','Mois'],[D(2026,1,15)],[D(2026,6,3)],[D(2026,10,31)]], fill:'B2:B4', sol:'=TEXTE(A2;"mmmm")', mustUse:['TEXTE'],
+    hint:'<code>TEXTE(value;"format")</code>. Month in full = <code>"mmmm"</code>.' },
+  { id:'t9', topic:'texte', title:'City code', task:'In <b>B2</b>, make a code with the first 3 letters of the city, in CAPITALS. Copied down to <b>B4</b>.',
+    grid:[['Ville','Code'],['Montréal'],['Laval'],['Québec']], fill:'B2:B4', sol:'=MAJUSCULE(GAUCHE(A2;3))', mustUse:['MAJUSCULE', 'GAUCHE'],
+    hint:'Put GAUCHE inside MAJUSCULE.' },
+  { id:'tq1', topic:'texte', type:'mcq', q:'What\'s the difference between <code>TROUVE</code> and <code>CHERCHE</code>?',
+    options:['TROUVE cares about capitals, CHERCHE doesn\'t', 'CHERCHE cares about capitals, TROUVE doesn\'t', 'TROUVE only works on numbers', 'No difference'], answer:0,
+    why:'<code>TROUVE("a";"Abc")</code> fails, <code>CHERCHE("a";"Abc")</code> gives 1.' },
+
+  // ---------- ROUNDING & RANDOM ----------
+  { id:'m1', topic:'divers', title:'Two decimals', task:'In <b>B2</b>, round the amount to <b>2</b> decimals. Copied down to <b>B4</b>.',
+    grid:[['Montant','Arrondi'],[12.3456],[7.899],[105.125]], fill:'B2:B4', sol:'=ARRONDI(A2;2)', mustUse:['ARRONDI'], hint:'<code>ARRONDI(number;decimals)</code>' },
+  { id:'m2', topic:'divers', title:'Round to hundreds', task:'In <b>B2</b>, round the salary to the nearest <b>hundred</b>. Copied down to <b>B4</b>.',
+    grid:[['Salaire','Arrondi'],[48725],[52349],[61050]], fill:'B2:B4', sol:'=ARRONDI(A2;-2)', mustUse:['ARRONDI'], fmts:{A:'$', B:'$'},
+    hint:'Negative decimals round to the left of the comma: <code>-2</code> = hundreds.' },
+  { id:'m3', topic:'divers', title:'Full hours', task:'In <b>B2</b>, how many <i>full</i> hours are in these minutes? Copied down to <b>B4</b>.',
+    grid:[['Minutes','Heures complètes'],[135],[59],[480]], fill:'B2:B4', sol:'=ENT(A2/60)', mustUse:['ENT'], hint:'Divide by 60, then cut off the decimals with <code>ENT</code>.' },
+  { id:'m4', topic:'divers', title:'Roll a die', task:'In <b>B1</b>, generate a random whole number from <b>1 to 6</b>.',
+    grid:[['Dé']], target:'B1', sol:'=ALEA.ENTRE.BORNES(1;6)', mustUse:['ALEA.ENTRE.BORNES'], noRef:true,
+    check:v => Number.isInteger(v) && v >= 1 && v <= 6, hint:'<code>ALEA.ENTRE.BORNES(min;max)</code>' },
+  { id:'m5', topic:'divers', title:'Safe division', task:'In <b>D2</b>, calculate the price per unit (total ÷ quantity). If there\'s an error, show <b>0</b> instead. Copied down to <b>D4</b>.',
+    grid:[['Article','Total','Qté','Prix/unité'],['Stylos',12,4],['Cahiers',0,0],['Gommes',6,3]], fill:'D2:D4', sol:'=SIERREUR(B2/C2;0)', mustUse:['SIERREUR'], fmts:{B:'$', D:'$'},
+    hint:'<code>SIERREUR(calculation;what to show if error)</code>' },
+  { id:'mq1', topic:'divers', type:'mcq', q:'What does <code>=ALEA()</code> return?',
+    options:['A decimal number from 0 up to (but not) 1', 'A whole number from 1 to 100', 'Always the same number', 'VRAI or FAUX'], answer:0,
+    why:'For whole numbers in a range, use ALEA.ENTRE.BORNES. Both change every time the sheet recalculates (F9).' },
+  { id:'mq2', topic:'divers', type:'mcq', q:'What does <code>=ENT(-3,7)</code> give?',
+    options:['-4', '-3', '3,7', '-3,7'], answer:0, why:'ENT always goes <i>down</i> to the next whole number. Below -3,7 is -4.' },
+  { id:'mq3', topic:'divers', type:'mcq', q:'What does <code>=ARRONDI(2,5;0)</code> give?',
+    options:['3', '2', '2,5', '#VALEUR!'], answer:0, why:'Excel rounds .5 away from zero, so 2,5 becomes 3.' },
+
+  // ---------- EXCEL TOOLS (quiz) ----------
+  { id:'o1', topic:'outils', type:'mcq', q:'You have 2000 sales rows. You want the total per region <i>and</i> per month, fast. Best tool?',
+    options:['Tableau croisé dynamique', 'Filtre avancé', 'Sous-totaux', 'Validation des données'], answer:0, why:'Pivot tables summarize big lists by any category you drag in.' },
+  { id:'o2', topic:'outils', type:'mcq', q:'Before using <b>Sous-totaux</b>, what must you do?',
+    options:['Sort the list by the column you group on', 'Protect the sheet', 'Create a chart', 'Remove all formulas'], answer:0,
+    why:'Sous-totaux groups rows that are next to each other. Without sorting, you get a subtotal every time the value changes.' },
+  { id:'o3', topic:'outils', type:'mcq', q:'A <b>filtre avancé</b> needs something the normal filter doesn\'t. What?',
+    options:['A criteria range (zone de critères) with the same headers', 'A pivot table', 'A password', 'A chart'], answer:0,
+    why:'You write the headers + your conditions somewhere on the sheet, then point the advanced filter to it.' },
+  { id:'o4', topic:'outils', type:'mcq', q:'Where do you find <b>Supprimer les doublons</b>?',
+    options:['Données tab', 'Accueil tab', 'Insertion tab', 'Révision tab'], answer:0, why:'Données → Outils de données → Supprimer les doublons.' },
+  { id:'o5', topic:'outils', type:'mcq', q:'You want a cell to only accept a choice from a dropdown list. What do you use?',
+    options:['Validation des données → Liste', 'Mise en forme conditionnelle', 'Protéger la feuille', 'Filtre'], answer:0, why:'Données → Validation des données → Autoriser : Liste.' },
+  { id:'o6', topic:'outils', type:'mcq', q:'You want to protect the sheet, but people must still type in B2:B10. What do you do <i>first</i>?',
+    options:['Unlock B2:B10 (Format de cellule → Protection → uncheck Verrouillée), then protect', 'Protect the sheet, then unlock B2:B10', 'Hide column B', 'Nothing, protection only blocks formulas'], answer:0,
+    why:'All cells are "locked" by default, but it only matters once the sheet is protected. Unlock first, protect after.' },
+  { id:'o7', topic:'outils', type:'mcq', q:'Which chart shows <b>parts of a whole</b> (like the % of budget per expense)?',
+    options:['Circulaire (pie)', 'Histogramme (column)', 'Courbe (line)', 'Nuage de points (scatter)'], answer:0,
+    why:'Pie = parts of 100%. Column (histogramme) = compare values between categories.' },
+  { id:'o8', topic:'outils', type:'mcq', q:'You want every grade under 60 to turn red <i>automatically</i>. What do you use?',
+    options:['Mise en forme conditionnelle', 'A SI function', 'Validation des données', 'Format de nombre'], answer:0, why:'Accueil → Mise en forme conditionnelle → Règles de mise en surbrillance → Inférieur à…' },
+  { id:'o9', topic:'outils', type:'mcq', q:'You print a long list. How do you repeat the header row on every page?',
+    options:['Mise en page → Imprimer les titres → Lignes à répéter en haut', 'Copy the header every 40 rows', 'Insert a page header', 'Freeze panes'], answer:0,
+    why:'Freezing panes only works on screen, not on paper.' },
+  { id:'o10', topic:'outils', type:'mcq', q:'Cell A1 contains <code>0,15</code>. How do you make it show <b>15 %</b>?',
+    options:['Apply the Pourcentage number format', 'Retype it as 15', 'Use =A1*100', 'Use the TEXTE function'], answer:0,
+    why:'The number format changes how it looks, not the value. The value stays 0,15, so calculations stay right.' },
+];
+
+// --- Build a sheet from a grid ---
+function buildSheet(ex){
+  const cells = {}, fmt = {};
+  (ex.grid || []).forEach((row, ri) => (row || []).forEach((v, ci) => {
+    const a = numToCol(ci + 1) + (ri + 1);
+    if (v === '' || v === null || v === undefined) return;
+    if (typeof v === 'object' && 'date' in v){ cells[a] = v.date; fmt[a] = 'date'; } else cells[a] = v;
+  }));
+  const targets = [];
+  if (ex.fill){ const [a, b] = ex.fill.split(':').map(parseAddr); for (let r = a.r; r <= b.r; r++) targets.push({ c:a.c, r }); }
+  else if (ex.target) targets.push(parseAddr(ex.target));
+  const fmtOf = addr => { if (fmt[addr]) return fmt[addr]; const f = ex.fmts || {}; if (f[addr]) return f[addr]; const col = addr.replace(/\d+/, ''); return f[col] || null; };
+  return { cells, targets, fmtOf };
+}
+function display(v, f){
+  if (v === null || v === undefined || v === '') return '';
+  if (typeof v === 'boolean') return v ? 'VRAI' : 'FAUX';
+  if (typeof v === 'string') return v;
+  if (f === 'date'){ const d = fromSerial(v); return pad(d.getUTCDate()) + '/' + pad(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear(); }
+  if (f === '$') return v.toLocaleString('fr-CA', { minimumFractionDigits:2, maximumFractionDigits:2 }) + ' $';
+  if (f === 'pct') return (v * 100).toLocaleString('fr-CA', { maximumFractionDigits:2 }) + ' %';
+  return v.toLocaleString('fr-CA', { maximumFractionDigits:6, useGrouping:false });
+}
+function same(a, b){
+  if (typeof a === 'number' && typeof b === 'number') return Math.abs(a - b) <= 1e-6 * Math.max(1, Math.abs(b));
+  if (typeof a === 'string' && typeof b === 'string') return stripAcc(a.trim()).toLowerCase() === stripAcc(b.trim()).toLowerCase();
+  return a === b;
+}
+
+// --- Check a typed formula against the exercise ---
+function runExercise(ex, formula){
+  const sh = buildSheet(ex);
+  let ast;
+  try { ast = parse(formula); } catch (e){ return { parseError:e.msg || String(e), code:e.code }; }
+  const refAst = parse(ex.sol);
+  const first = sh.targets[0];
+  const results = sh.targets.map(t => {
+    const ctx = { cells:sh.cells, dr:t.r - first.r, dc:t.c - first.c, self:t };
+    const addr = numToCol(t.c) + t.r;
+    let got, err = null, exp;
+    try { got = evaluate(ast, ctx); } catch (e){ if (!(e instanceof XErr)) throw e; err = e; }
+    if (ex.check){
+      let ok = !err;
+      if (ok) for (let i = 0; i < 40 && ok; i++){ try { ok = ex.check(evaluate(ast, ctx)); } catch (e){ ok = false; } }
+      return { addr, got, err, exp:null, ok };
+    }
+    exp = evaluate(refAst, ctx);
+    return { addr, got, err, exp, ok:!err && same(got, exp) };
+  });
+  const info = collect(ast);
+  const missing = (ex.mustUse || []).filter(f => !info.fns.has(f));
+  const allOk = results.every(r => r.ok);
+  return { results, missing, noRefs:!ex.noRef && info.refs === 0, allOk, pass:allOk && !missing.length && (ex.noRef || info.refs > 0), sh };
+}
+
+/* ==================================================================
+   PART C — CHEAT SHEET DATA
+   ================================================================== */
+const CHEAT = [
+  ['bases', 'SOMME', 'SUM', 'SOMME(plage)', 'Adds up numbers.', '=SOMME(B2:B7)'],
+  ['bases', 'MOYENNE', 'AVERAGE', 'MOYENNE(plage)', 'Average of the numbers.', '=MOYENNE(B2:B6)'],
+  ['bases', 'MAX', 'MAX', 'MAX(plage)', 'The biggest number.', '=MAX(B2:B6)'],
+  ['bases', 'MIN', 'MIN', 'MIN(plage)', 'The smallest number.', '=MIN(B2:B6)'],
+  ['bases', 'NB', 'COUNT', 'NB(plage)', 'Counts cells with numbers only.', '=NB(B2:B6)'],
+  ['bases', 'NBVAL', 'COUNTA', 'NBVAL(plage)', 'Counts every non-empty cell (text too).', '=NBVAL(A2:A6)'],
+  ['bases', '$ (absolute)', 'F4', '$A$1 · A$1 · $A1', 'Locks the column and/or row when copying. F4 cycles through them.', '=B2*$F$1'],
+  ['logique', 'SI', 'IF', 'SI(test;si_vrai;si_faux)', 'Shows one thing if the test is true, another if false.', '=SI(B2>=60;"Réussi";"Échec")'],
+  ['logique', 'ET', 'AND', 'ET(test1;test2;…)', 'VRAI only if ALL tests are true.', '=SI(ET(B2>=18;C2="Oui");"Admis";"Refusé")'],
+  ['logique', 'OU', 'OR', 'OU(test1;test2;…)', 'VRAI if AT LEAST ONE test is true.', '=SI(OU(B2>=50;C2="Oui");0;8)'],
+  ['logique', 'NON', 'NOT', 'NON(test)', 'Flips VRAI ↔ FAUX.', '=NON(B2="Oui")'],
+  ['logique', 'SI imbriqué', 'nested IF', 'SI(test1;a;SI(test2;b;c))', 'Several levels. Test the biggest condition first.', '=SI(B2>=85;"Excellent";SI(B2>=60;"Bon";"Échec"))'],
+  ['recherche', 'RECHERCHEX', 'XLOOKUP', 'RECHERCHEX(cherché;plage_recherche;plage_résultat;[si_introuvable];[mode])', 'Finds a value in one column and returns the matching value from another. Mode -1 = exact or next smaller.', '=RECHERCHEX(E2;A2:A6;C2:C6;"Introuvable")'],
+  ['recherche', 'RECHERCHEV', 'VLOOKUP', 'RECHERCHEV(cherché;table;no_col;FAUX)', 'Older lookup: searches the first column of a table. Use FAUX for exact match.', '=RECHERCHEV(E2;A2:C6;3;FAUX)'],
+  ['recherche', 'NB.SI', 'COUNTIF', 'NB.SI(plage;critère)', 'Counts cells that match a criterion.', '=NB.SI(B2:B6;">=60")'],
+  ['recherche', 'SOMME.SI', 'SUMIF', 'SOMME.SI(plage_critère;critère;plage_somme)', 'Adds only the rows that match.', '=SOMME.SI(B2:B7;"Nord";C2:C7)'],
+  ['recherche', 'MOYENNE.SI', 'AVERAGEIF', 'MOYENNE.SI(plage_critère;critère;plage_moyenne)', 'Averages only the rows that match.', '=MOYENNE.SI(B2:B7;"Nord";C2:C7)'],
+  ['recherche', 'NB.SI.ENS', 'COUNTIFS', 'NB.SI.ENS(plage1;crit1;plage2;crit2)', 'Counts rows matching several criteria.', '=NB.SI.ENS(B2:B7;"Nord";C2:C7;">3000")'],
+  ['dates', 'AUJOURDHUI', 'TODAY', 'AUJOURDHUI()', 'Today\'s date. Updates by itself.', '=AUJOURDHUI()'],
+  ['dates', 'MAINTENANT', 'NOW', 'MAINTENANT()', 'Today\'s date + the current time.', '=MAINTENANT()'],
+  ['dates', 'JOUR / MOIS / ANNEE', 'DAY / MONTH / YEAR', 'ANNEE(date)', 'Pulls the day, month or year out of a date.', '=ANNEE(B2)'],
+  ['dates', 'JOURSEM', 'WEEKDAY', 'JOURSEM(date;[type])', 'Weekday number. Type 2 → Monday = 1 … Sunday = 7.', '=JOURSEM(B2;2)'],
+  ['dates', 'DATE', 'DATE', 'DATE(année;mois;jour)', 'Builds a date from 3 numbers.', '=DATE(A2;B2;C2)'],
+  ['dates', 'Date math', '—', 'date2 - date1 · date + n', 'Dates are days, so you can subtract them or add days.', '=C2-B2'],
+  ['texte', 'GAUCHE', 'LEFT', 'GAUCHE(texte;nb)', 'The first characters.', '=GAUCHE(A2;3)'],
+  ['texte', 'DROITE', 'RIGHT', 'DROITE(texte;nb)', 'The last characters.', '=DROITE(A2;4)'],
+  ['texte', 'STXT', 'MID', 'STXT(texte;début;nb)', 'Characters from the middle.', '=STXT(A2;4;2)'],
+  ['texte', 'NBCAR', 'LEN', 'NBCAR(texte)', 'How many characters (spaces count).', '=NBCAR(A2)'],
+  ['texte', 'TROUVE', 'FIND', 'TROUVE(cherché;texte;[début])', 'Position of a piece of text. Case-sensitive.', '=TROUVE("@";A2)'],
+  ['texte', 'CHERCHE', 'SEARCH', 'CHERCHE(cherché;texte)', 'Like TROUVE, but ignores capitals.', '=CHERCHE("a";A2)'],
+  ['texte', 'TEXTE', 'TEXT', 'TEXTE(valeur;"format")', 'Turns a number or date into formatted text. "jjjj" = day name, "mmmm" = month name, "0,00" = 2 decimals.', '=TEXTE(A2;"mmmm")'],
+  ['texte', 'MAJUSCULE / MINUSCULE', 'UPPER / LOWER', 'MAJUSCULE(texte)', 'All capitals / all small letters. NOMPROPRE = First Letter Capital.', '=MAJUSCULE(A2)'],
+  ['texte', '& (join)', '&', 'texte1&texte2', 'Glues text together. CONCAT does the same.', '=A2&" "&B2'],
+  ['divers', 'ARRONDI', 'ROUND', 'ARRONDI(nombre;décimales)', 'Rounds. Negative decimals = tens, hundreds…', '=ARRONDI(A2;2)'],
+  ['divers', 'ARRONDI.SUP / .INF', 'ROUNDUP / ROUNDDOWN', 'ARRONDI.SUP(nombre;décimales)', 'Always rounds up / always down.', '=ARRONDI.SUP(A2;0)'],
+  ['divers', 'ENT', 'INT', 'ENT(nombre)', 'Drops the decimals (goes down).', '=ENT(A2/60)'],
+  ['divers', 'ALEA', 'RAND', 'ALEA()', 'Random decimal from 0 to 1.', '=ALEA()'],
+  ['divers', 'ALEA.ENTRE.BORNES', 'RANDBETWEEN', 'ALEA.ENTRE.BORNES(min;max)', 'Random whole number between min and max.', '=ALEA.ENTRE.BORNES(1;6)'],
+  ['divers', 'SIERREUR', 'IFERROR', 'SIERREUR(valeur;si_erreur)', 'Shows something else instead of an error.', '=SIERREUR(B2/C2;0)'],
+  ['outils', 'Errors', '—', '#NOM? · #VALEUR! · #DIV/0! · #N/A · #REF!', 'Misspelled name · wrong type (text in math) · divide by 0 · not found · bad reference.', ''],
+];
+
+/* ==================================================================
+   PART D — THE APP (screens, progress, clicks)
+   ================================================================== */
+const STORE_KEY = 'cafe-formules-v1';
+function loadProgress(){ try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { ex:{}, streak:0, best:0 }; } catch (e){ return { ex:{}, streak:0, best:0 }; } }
+function saveProgress(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(P)); } catch (e){ /* storage off: progress lives in memory only */ } }
+let P = loadProgress();
+const S = { view:'home', queue:[], qi:0, topic:null, done:false, result:null, showHint:false, showSol:false, picked:null, draft:'=' };
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const exById = id => EX.find(e => e.id === id);
+const topicStats = tid => { const list = EX.filter(e => !tid || e.topic === tid); return { total:list.length, solved:list.filter(e => P.ex[e.id] && P.ex[e.id].s).length }; };
+
+// Little café cat. mood: happy / think / sad
+function cat(mood = 'think', size = 56){
+  const eyes = mood === 'happy'
+    ? '<path d="M22 34q4-5 8 0M42 34q4-5 8 0" stroke="var(--ink)" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    : mood === 'sad'
+    ? '<path d="M22 32l8 3M50 32l-8 3" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><circle cx="27" cy="38" r="2.6" fill="var(--ink)"/><circle cx="45" cy="38" r="2.6" fill="var(--ink)"/>'
+    : '<circle cx="27" cy="35" r="3.2" fill="var(--ink)"/><circle cx="45" cy="35" r="3.2" fill="var(--ink)"/>';
+  const mouth = mood === 'sad' ? '<path d="M31 50q5-4 10 0" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round"/>'
+    : '<path d="M31 47q2.5 3 5 0q2.5 3 5 0" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 72 72" aria-hidden="true">
+    <path d="M10 30L14 6l18 14M62 30L58 6 40 20" fill="var(--accent)" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17 13l1.6 9 6-3M55 13l-1.6 9-6-3" fill="var(--accent-soft)"/>
+    <ellipse cx="36" cy="40" rx="27" ry="24" fill="var(--accent)"/>
+    <ellipse cx="36" cy="44" rx="19" ry="15" fill="var(--surface)"/>
+    ${eyes}<path d="M33 42h6l-3 3z" fill="var(--bad)"/>${mouth}
+    <path d="M6 42h14M7 48l13-3M66 42H52M65 48l-13-3" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>`;
+}
+
+// ---------- SCREENS ----------
+function viewHome(){
+  const all = topicStats();
+  return `
+  <section class="hero">
+    <div class="card">
+      ${cat('happy', 72)}
+      <div>
+        <h2>Pull up a chair, Sis.</h2>
+        <p class="muted" style="margin:0 0 12px">${all.solved} of ${all.total} exercises solved. Same French functions and <code class="mono">;</code> as your exam.</p>
+        <button class="btn btn-main" data-start="mix">Mix everything</button>
+      </div>
+    </div>
+  </section>
+  <h2 style="font-size:1.3rem;margin-bottom:12px">Or pick a topic</h2>
+  <div class="topics">
+    ${TOPICS.map(t => { const st = topicStats(t.id), pct = Math.round(100 * st.solved / st.total);
+      return `<button class="topic" data-start="${t.id}">
+        <span class="pill">${t.week}</span>
+        <h3>${t.name}</h3>
+        <span class="muted" style="font-size:.9rem">${t.sub}</span>
+        <div class="bar" aria-hidden="true"><span style="width:${pct}%"></span></div>
+        <div class="row"><span>${st.solved}/${st.total} solved</span><span>${pct === 100 ? 'All done ✓' : 'Start →'}</span></div>
+      </button>`; }).join('')}
+  </div>`;
+}
+
+function sheetHTML(ex, res){
+  const sh = buildSheet(ex);
+  const tset = new Set(sh.targets.map(t => numToCol(t.c) + t.r));
+  const firstT = sh.targets[0] ? numToCol(sh.targets[0].c) + sh.targets[0].r : null;
+  let maxC = 1, maxR = ex.grid.length;
+  ex.grid.forEach(r => { maxC = Math.max(maxC, (r || []).length); });
+  sh.targets.forEach(t => { maxC = Math.max(maxC, t.c); maxR = Math.max(maxR, t.r); });
+  const byAddr = {}; if (res && res.results) res.results.forEach(r => byAddr[r.addr] = r);
+  let h = '<table class="sheet"><thead><tr><th class="rh"></th>';
+  for (let c = 1; c <= maxC; c++) h += `<th>${numToCol(c)}</th>`;
+  h += '</tr></thead><tbody>';
+  for (let r = 1; r <= maxR; r++){
+    h += `<tr><th class="rh">${r}</th>`;
+    for (let c = 1; c <= maxC; c++){
+      const a = numToCol(c) + r; let v = sh.cells[a], cls = [], content;
+      if (tset.has(a)){
+        cls.push(a === firstT ? 'target' : 'fillc');
+        const rr = byAddr[a];
+        if (rr){ cls = [rr.ok ? 'ok' : 'bad']; content = rr.err ? rr.err.code : display(rr.got, sh.fmtOf(a)); if (typeof rr.got === 'number' && !rr.err) cls.push('num'); }
+        else content = a === firstT ? '?' : '';
+      } else { content = display(v, sh.fmtOf(a)); if (typeof v === 'number') cls.push('num'); }
+      h += `<td class="${cls.join(' ')}" data-addr="${a}" title="${a}">${esc(content)}</td>`;
+    }
+    h += '</tr>';
+  }
+  return h + '</tbody></table>';
+}
+
+function feedbackHTML(ex, res){
+  if (!res) return '';
+  if (res.parseError) return fb('sad', res.code && res.code !== 'PARSE' ? res.code : 'Formula problem', res.parseError);
+  if (res.pass) return fb('happy', pick(['Purrfect!', 'Miaou! Nailed it.', 'The café cat approves.', 'Clean formula. Chef\'s kiss.', 'Exam-ready.']),
+    (ex.fill ? `All ${res.results.length} copied cells are right. ` : '') + `Model answer: <code>${esc(ex.sol)}</code>`, 'ok');
+  if (res.allOk && res.missing.length) return fb('think', 'Right answer, wrong tool', `This exercise wants you to use <code>${res.missing.join('</code>, <code>')}</code>.`);
+  if (res.allOk && res.noRefs) return fb('think', 'Typed by hand?', 'The result is right, but use cell references (like <code>B2</code>) so it updates when the data changes.');
+  const bad = res.results.find(r => !r.ok), firstOk = res.results[0].ok;
+  if (bad.err) return fb('sad', bad.err.code + ' in ' + bad.addr, bad.err.msg + (firstOk && ex.fill ? ' <br>Your first cell works — the problem appears when the formula is copied down.' : ''));
+  const f = res.sh.fmtOf(bad.addr);
+  if (firstOk && ex.fill) return fb('think', 'Breaks when copied', `Row ${res.results[0].addr.replace(/\D/g, '')} is right, but <b>${bad.addr}</b> gives <code>${esc(display(bad.got, f))}</code> instead of <code>${esc(display(bad.exp, f))}</code>. Should something be locked with <code>$</code>?`);
+  if (ex.check) return fb('think', 'Not quite', `<b>${bad.addr}</b> gave <code>${esc(display(bad.got, f))}</code>, which doesn't fit the task.`);
+  return fb('think', 'Not quite', `<b>${bad.addr}</b> gives <code>${esc(display(bad.got, f))}</code>. Expected <code>${esc(display(bad.exp, f))}</code>.`);
+}
+const fb = (mood, title, body, kind = 'bad') => `<div class="feedback ${kind}"><span class="cat ${kind === 'ok' ? 'hop' : ''}">${cat(mood, 48)}</span><div class="msg"><strong>${title}</strong>${body}</div></div>`;
+
+function viewPractice(){
+  if (S.done) return viewDone();
+  const ex = exById(S.queue[S.qi]);
+  const topic = TOPICS.find(t => t.id === ex.topic);
+  const top = `<div class="topbar">
+      <button class="btn btn-ghost" data-go="home">← Topics</button>
+      <span class="pill">${S.topic === 'mix' ? 'Mix · ' + topic.name : topic.name}</span>
+      <span class="count muted">${S.qi + 1} / ${S.queue.length}</span>
+    </div>`;
+  if (ex.type === 'mcq'){
+    const answered = S.picked !== null;
+    return top + `<div class="card task">
+      <h2>Quick quiz</h2><p>${ex.q}</p>
+      <div class="options" role="group" aria-label="Answers">
+        ${ex.order.map(i => { let cls = ''; if (answered){ if (i === ex.answer) cls = 'ok'; else if (i === S.picked) cls = 'bad'; }
+          return `<button class="opt ${cls}" data-opt="${i}" ${answered ? 'disabled' : ''}>${ex.options[i]}</button>`; }).join('')}
+      </div>
+      ${answered ? (S.picked === ex.answer ? fb('happy', pick(['Purrfect!', 'Yes!', 'Correct, Sis.']), ex.why, 'ok') : fb('sad', 'Not this one', ex.why)) : ''}
+      ${answered ? `<div class="actions"><button class="btn btn-main" data-next>Next →</button></div>` : ''}
+    </div>`;
+  }
+  const res = S.result;
+  return top + `<div class="card task">
+    <h2>${ex.title}</h2>
+    <p>${ex.task}</p>
+    <div class="sheet-wrap">${sheetHTML(ex, res && !res.parseError ? res : null)}</div>
+    <div class="fx"><label for="formula">fx</label>
+      <input id="formula" autocomplete="off" spellcheck="false" autocapitalize="off" value="${esc(S.draft)}" placeholder="=SOMME(B2:B7)" aria-describedby="fxtip"></div>
+    <p class="tip" id="fxtip">Tip: click a cell to insert it. Press Enter to check.</p>
+    <div class="actions">
+      ${res && res.pass ? `<button class="btn btn-main" data-next>Next →</button>` : `<button class="btn btn-main" data-check>Check ✓</button>`}
+      <button class="btn" data-hint>${S.showHint ? 'Hide hint' : 'Hint'}</button>
+      ${res && res.pass ? '' : `<button class="btn btn-ghost" data-sol>Show solution</button><button class="btn btn-ghost" data-next>Skip</button>`}
+    </div>
+    ${S.showHint ? `<div class="feedback" style="margin-top:12px"><div class="msg"><strong>Hint</strong>${ex.hint}</div></div>` : ''}
+    ${S.showSol && !(res && res.pass) ? `<div class="feedback" style="margin-top:12px"><div class="msg"><strong>Solution</strong><code>${esc(ex.sol)}</code><br><span class="muted">Now type it yourself — it helps it stick.</span></div></div>` : ''}
+    ${feedbackHTML(ex, res)}
+  </div>`;
+}
+
+function viewDone(){
+  const ids = S.queue, solved = ids.filter(id => P.ex[id] && P.ex[id].s).length;
+  return `<div class="card empty">
+    ${cat(solved === ids.length ? 'happy' : 'think', 96)}
+    <h2 style="margin:12px 0 6px">Round finished!</h2>
+    <p>${solved} of ${ids.length} solved in this round.</p>
+    <div class="actions" style="justify-content:center">
+      <button class="btn btn-main" data-start="${S.topic}">Go again</button>
+      <button class="btn" data-go="home">Pick another topic</button>
+    </div>
+  </div>`;
+}
+
+function viewProgress(){
+  const all = topicStats();
+  const tried = Object.values(P.ex).filter(x => x.a > 0);
+  const first = tried.filter(x => x.first).length;
+  if (!tried.length) return `<div class="card empty">${cat('think', 88)}<h2 style="margin:12px 0 6px">No progress yet</h2><p>Solve your first exercise and your stats show up here.</p><button class="btn btn-main" data-start="mix">Start practicing</button></div>`;
+  return `
+  <div class="stats">
+    <div class="card stat"><b>${all.solved}/${all.total}</b><span class="muted">solved</span></div>
+    <div class="card stat"><b>${first}</b><span class="muted">right on first try</span></div>
+    <div class="card stat"><b>${P.streak}</b><span class="muted">current streak (best ${P.best})</span></div>
+  </div>
+  <div class="card">
+    ${TOPICS.map(t => { const st = topicStats(t.id), pct = Math.round(100 * st.solved / st.total);
+      return `<div class="prog-row"><div><b>${t.name}</b><br><span class="muted" style="font-size:.85rem">${t.week}</span></div>
+        <div class="bar"><span style="width:${pct}%"></span></div>
+        <button class="btn" data-start="${t.id}">${st.solved}/${st.total} · ${pct < 100 ? 'Practice' : 'Redo'}</button></div>`; }).join('')}
+  </div>
+  <p style="text-align:right"><button class="btn btn-ghost" data-reset>Reset my progress</button></p>`;
+}
+
+function viewCheat(){
+  return `<div class="cheat">
+    <h2 style="font-size:1.5rem">Cheat sheet</h2>
+    <p class="muted" style="margin:4px 0 0">French name, English name, syntax, example. Your exam is open-book — this is the kind of page to keep open.</p>
+    <label for="q" class="muted" style="position:absolute;left:-9999px">Search a function</label>
+    <input id="q" class="search" placeholder="Search: si, date, compte, lookup…" value="${esc(S.cheatQ || '')}">
+    <div id="cheat-list">${cheatList(S.cheatQ || '')}</div>
+  </div>`;
+}
+function cheatList(q){
+  const k = stripAcc(q).toLowerCase().trim();
+  const rows = CHEAT.filter(r => !k || stripAcc(r.join(' ')).toLowerCase().includes(k));
+  if (!rows.length) return `<div class="empty">${cat('sad', 64)}<p>Nothing matches "${esc(q)}". Try the French or English name.</p></div>`;
+  return TOPICS.map(t => { const g = rows.filter(r => r[0] === t.id); if (!g.length) return '';
+    return `<h3>${t.name}</h3>` + g.map(([, fr, en, syn, does, exm]) => `<div class="card fn">
+      <div class="top"><span class="name">${esc(fr)}</span><span class="muted">${esc(en)}</span></div>
+      <div class="syn">${esc(syn)}</div><p>${esc(does)}</p>${exm ? `<p class="muted">Ex: <code>${esc(exm)}</code></p>` : ''}</div>`).join(''); }).join('');
+}
+
+// ---------- ACTIONS ----------
+function start(tid){
+  let list = tid === 'mix' ? EX.slice().sort(() => Math.random() - .5) : EX.filter(e => e.topic === tid);
+  if (tid !== 'mix'){ const firstUnsolved = list.findIndex(e => !(P.ex[e.id] && P.ex[e.id].s)); if (firstUnsolved > 0) list = list.slice(firstUnsolved).concat(list.slice(0, firstUnsolved)); }
+  S.queue = list.map(e => e.id); S.qi = 0; S.topic = tid; S.done = false; S.view = 'practice';
+  resetExercise(); render();
+}
+function resetExercise(){
+  S.result = null; S.showHint = false; S.showSol = false; S.picked = null; S.draft = '=';
+  const ex = exById(S.queue[S.qi]);
+  if (ex && ex.type === 'mcq') ex.order = ex.options.map((_, i) => i).sort(() => Math.random() - .5);
+}
+function record(id, ok){
+  const r = P.ex[id] || (P.ex[id] = { s:false, a:0, first:false });
+  if (r.s){ return; }
+  r.a++;
+  if (ok){ r.s = true; if (r.a === 1 && !S.showSol) r.first = true; P.streak++; P.best = Math.max(P.best, P.streak); }
+  else P.streak = 0;
+  saveProgress();
+}
+function check(){
+  const input = document.getElementById('formula'); if (!input) return;
+  S.draft = input.value;
+  const ex = exById(S.queue[S.qi]);
+  let f = S.draft.trim(); if (f && !f.startsWith('=')) f = '=' + f;
+  try { S.result = runExercise(ex, f); }
+  catch (e){ S.result = { parseError:'Something unexpected happened with this formula. Try writing it another way.' }; }
+  record(ex.id, !!S.result.pass);
+  render(); focusFormula();
+}
+function next(){ if (S.qi + 1 >= S.queue.length) S.done = true; else { S.qi++; resetExercise(); } render(); focusFormula(); }
+function focusFormula(){ const i = document.getElementById('formula'); if (i){ i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }
+
+function render(){
+  document.querySelectorAll('nav button').forEach(b => b.setAttribute('aria-current', (b.dataset.go === S.view || (b.dataset.go === 'home' && S.view === 'practice')) ? 'page' : 'false'));
+  const app = document.getElementById('app');
+  app.innerHTML = S.view === 'practice' ? viewPractice() : S.view === 'progress' ? viewProgress() : S.view === 'cheat' ? viewCheat() : viewHome();
+}
+
+function init(){
+  document.getElementById('logo').innerHTML = cat('happy', 44);
+  document.addEventListener('click', e => {
+    const t = e.target.closest('button, td[data-addr]'); if (!t) return;
+    if (t.dataset.go){ S.view = t.dataset.go; render(); window.scrollTo(0, 0); return; }
+    if (t.dataset.start){ start(t.dataset.start); window.scrollTo(0, 0); return; }
+    if (t.hasAttribute('data-check')) return check();
+    if (t.hasAttribute('data-next')) return next();
+    if (t.hasAttribute('data-hint')){ S.draft = (document.getElementById('formula') || {}).value || S.draft; S.showHint = !S.showHint; render(); return focusFormula(); }
+    if (t.hasAttribute('data-sol')){ S.draft = (document.getElementById('formula') || {}).value || S.draft; S.showSol = true; render(); return focusFormula(); }
+    if (t.hasAttribute('data-reset')){ if (confirm('Erase all your progress? This can\'t be undone.')){ P = { ex:{}, streak:0, best:0 }; saveProgress(); render(); } return; }
+    if (t.dataset.opt !== undefined){ const ex = exById(S.queue[S.qi]); S.picked = +t.dataset.opt; record(ex.id, S.picked === ex.answer); render(); const n = document.querySelector('[data-next]'); if (n) n.focus(); return; }
+    if (t.dataset.addr){
+      const input = document.getElementById('formula'); if (!input) return;
+      if (!input.value.startsWith('=')) input.value = '=' + input.value;
+      const s = input.selectionStart ?? input.value.length, en = input.selectionEnd ?? input.value.length;
+      input.setRangeText(t.dataset.addr, Math.max(s, 1), Math.max(en, 1), 'end'); input.focus(); S.draft = input.value;
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (e.target.id === 'formula'){ e.preventDefault(); if (S.result && S.result.pass) next(); else check(); }
+  });
+  document.addEventListener('input', e => {
+    if (e.target.id === 'formula') S.draft = e.target.value;
+    if (e.target.id === 'q'){ S.cheatQ = e.target.value; document.getElementById('cheat-list').innerHTML = cheatList(S.cheatQ); }
+  });
+  render();
+}
+if (typeof document !== 'undefined') init();
+</script>
+</body>
+</html>
